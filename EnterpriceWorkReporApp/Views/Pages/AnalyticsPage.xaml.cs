@@ -121,7 +121,29 @@ namespace EnterpriseWorkReport.Views.Pages
                 if (settings != null && !string.IsNullOrEmpty(settings.MasterNamesPath))
                     nameMatcher.LoadMasterNames(settings.MasterNamesPath);
 
-                int imported = _masterDataService.SyncMasterFile(project.Id, project.MasterFilePath, true, project.MasterFilePassword, nameMatcher);
+                int imported = 0;
+                try
+                {
+                    imported = _masterDataService.SyncMasterFile(project.Id, project.MasterFilePath, true, project.MasterFilePassword, nameMatcher);
+                }
+                catch (Exception ex) when (ex.Message.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0 || ex.Message.IndexOf("encrypt", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var pwdDialog = new PasswordDialog();
+                    if (pwdDialog.ShowDialog() == true)
+                    {
+                        string pwd = pwdDialog.Password;
+                        // Update stored password (encrypted)
+                        string encrypted = SecretService.EncryptSecret(pwd);
+                        conn.Execute("UPDATE Projects SET MasterFilePassword = @P WHERE Id = @Id", new { P = encrypted, Id = project.Id });
+                        // Retry with new password
+                        imported = _masterDataService.SyncMasterFile(project.Id, project.MasterFilePath, true, pwd, nameMatcher);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Password required to sync master file.", "Cancelled", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+                }
 
                 MessageBox.Show($"✅ Sync Complete! Imported {imported} records.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadData();
@@ -192,9 +214,12 @@ namespace EnterpriseWorkReport.Views.Pages
             HoldCountText.Text = summary.HoldCount.ToString("N0");
             ErrorCountText.Text = summary.ErrorCount.ToString("N0");
 
-            // Load Manifest Details for current date
-            var currentDate = DateTime.Today;
-            var manifestDetails = _masterDataService.GetManifestDetails(_selectedProjectId, currentDate);
+            // Today's Manifest Count
+            int todayManifestCount = _masterDataService.GetTodayManifestCount(_selectedProjectId);
+            TodayManifestsText.Text = todayManifestCount.ToString("N0");
+
+            // Load Manifest Details for current date (based on EndDate from batch)
+            var manifestDetails = _masterDataService.GetTodayManifestDetails(_selectedProjectId);
             ManifestDetailsGrid.ItemsSource = manifestDetails;
 
             // Load Status Breakdown Charts

@@ -130,22 +130,72 @@ namespace EnterpriseWorkReport.Views.Dialogs
         private void AppendExcel(string path)
         {
             string fileName = Path.GetFileNameWithoutExtension(path);
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var reader = ExcelReaderFactory.CreateReader(stream))
+            try
             {
-                var ds = reader.AsDataSet(new ExcelDataSetConfiguration { ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true } });
-                foreach (DataTable table in ds.Tables)
+                using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    var headers = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                    foreach (var h in headers) if (!_mainDataTable.Columns.Contains(h)) _mainDataTable.Columns.Add(h);
-                    foreach (DataRow sourceRow in table.Rows)
+                    var ds = reader.AsDataSet(new ExcelDataSetConfiguration
                     {
-                        if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
-                        var newRow = _mainDataTable.NewRow();
-                        foreach (var col in headers) newRow[col] = sourceRow[col];
-                        if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString())) newRow["Name"] = fileName;
-                        _mainDataTable.Rows.Add(newRow);
+                        ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                    });
+                    foreach (DataTable table in ds.Tables)
+                    {
+                        var headers = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+                        foreach (var h in headers) if (!_mainDataTable.Columns.Contains(h)) _mainDataTable.Columns.Add(h);
+                        foreach (DataRow sourceRow in table.Rows)
+                        {
+                            if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
+                            var newRow = _mainDataTable.NewRow();
+                            foreach (var col in headers) newRow[col] = sourceRow[col];
+                            if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString())) newRow["Name"] = fileName;
+                            _mainDataTable.Rows.Add(newRow);
+                        }
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0
+                    || ex.Message.IndexOf("encrypt", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var pwdDialog = new PasswordDialog();
+                    if (pwdDialog.ShowDialog() == true)
+                    {
+                        string password = pwdDialog.Password;
+                        using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        {
+                            var config = new ExcelReaderConfiguration { Password = password };
+                            using (var reader = ExcelReaderFactory.CreateReader(stream, config))
+                            {
+                                var ds = reader.AsDataSet(new ExcelDataSetConfiguration
+                                {
+                                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                                });
+                                foreach (DataTable table in ds.Tables)
+                                {
+                                    var headers = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+                                    foreach (var h in headers) if (!_mainDataTable.Columns.Contains(h)) _mainDataTable.Columns.Add(h);
+                                    foreach (DataRow sourceRow in table.Rows)
+                                    {
+                                        if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
+                                        var newRow = _mainDataTable.NewRow();
+                                        foreach (var col in headers) newRow[col] = sourceRow[col];
+                                        if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString())) newRow["Name"] = fileName;
+                                        _mainDataTable.Rows.Add(newRow);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Password required to read encrypted Excel file.");
+                    }
+                }
+                else
+                {
+                    throw;
                 }
             }
         }

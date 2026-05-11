@@ -14,37 +14,39 @@
     <Color x:Key="TextOnPrimary">#FFFFFF</Color>
     <Color x:Key="SidebarTextColor">#DDD6FE</Color>
     <Color x:Key="SidebarActiveTextColor">#FFFFFF</Color>
-    <Color x:Key="SuccessColor">#22C55E</Color>
-    <Color x:Key="DangerColor">#EF4444</Color>
-    <Color x:Key="WarningColor">#F59E0B</Color>
-    <Color x:Key="BorderColor">#DDD6FE</Color>
+     <Color x:Key="SuccessColor">#22C55E</Color>
+     <Color x:Key="DangerColor">#EF4444</Color>
+     <Color x:Key="WarningColor">#F59E0B</Color>
+     <Color x:Key="InfoColor">#3B82F6</Color>
+     <Color x:Key="BorderColor">#DDD6FE</Color>
 
-    <LinearGradientBrush x:Key="PrimaryGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#C4B5FD" Offset="0" /><GradientStop Color="#DDD6FE" Offset="1" />
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="PrimaryGradientDarkBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#8B5CF6" Offset="0" /><GradientStop Color="#C4B5FD" Offset="1" />
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="SidebarGradientBrush" StartPoint="1,0" EndPoint="0,1">
-        <GradientStop Color="#4C1D95" Offset="0" /><GradientStop Color="#5B21B6" Offset="1" />
-    </LinearGradientBrush>
+     <LinearGradientBrush x:Key="PrimaryGradientBrush" StartPoint="0,0" EndPoint="1,1">
+         <GradientStop Color="#C4B5FD" Offset="0" /><GradientStop Color="#DDD6FE" Offset="1" />
+     </LinearGradientBrush>
+     <LinearGradientBrush x:Key="PrimaryGradientDarkBrush" StartPoint="0,0" EndPoint="1,1">
+         <GradientStop Color="#8B5CF6" Offset="0" /><GradientStop Color="#C4B5FD" Offset="1" />
+     </LinearGradientBrush>
+     <LinearGradientBrush x:Key="SidebarGradientBrush" StartPoint="1,0" EndPoint="0,1">
+         <GradientStop Color="#4C1D95" Offset="0" /><GradientStop Color="#5B21B6" Offset="1" />
+     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}"/>
-    <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{DynamicResource PrimaryDarkColor}"/>
-    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{DynamicResource PrimaryLightColor}"/>
-    <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentColor}"/>
-    <SolidColorBrush x:Key="SidebarBgBrush" Color="{DynamicResource SidebarBgColor}"/>
-    <SolidColorBrush x:Key="SidebarHoverBrush" Color="{DynamicResource SidebarHoverColor}"/>
-    <SolidColorBrush x:Key="AppBgBrush" Color="{DynamicResource AppBgColor}"/>
-    <SolidColorBrush x:Key="CardBgBrush" Color="{DynamicResource CardBgColor}"/>
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{DynamicResource TextPrimaryColor}"/>
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{DynamicResource TextSecondaryColor}"/>
-    <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="{DynamicResource TextOnPrimary}"/>
-    <SolidColorBrush x:Key="SidebarTextBrush" Color="{DynamicResource SidebarTextColor}"/>
-    <SolidColorBrush x:Key="SidebarActiveTextBrush" Color="{DynamicResource SidebarActiveTextColor}"/>
-    <SolidColorBrush x:Key="SuccessBrush" Color="{DynamicResource SuccessColor}"/>
-    <SolidColorBrush x:Key="DangerBrush" Color="{DynamicResource DangerColor}"/>
-    <SolidColorBrush x:Key="WarningBrush" Color="{DynamicResource WarningColor}"/>
-    <SolidColorBrush x:Key="BorderBrush_" Color="{DynamicResource BorderColor}"/>
-    <SolidColorBrush x:Key="TransparentBrush" Color="Transparent"/>
+     <SolidColorBrush x:Key="PrimaryBrush" Color="{DynamicResource PrimaryColor}"/>
+     <SolidColorBrush x:Key="PrimaryDarkBrush" Color="{DynamicResource PrimaryDarkColor}"/>
+     <SolidColorBrush x:Key="PrimaryLightBrush" Color="{DynamicResource PrimaryLightColor}"/>
+     <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentColor}"/>
+     <SolidColorBrush x:Key="SidebarBgBrush" Color="{DynamicResource SidebarBgColor}"/>
+     <SolidColorBrush x:Key="SidebarHoverBrush" Color="{DynamicResource SidebarHoverColor}"/>
+     <SolidColorBrush x:Key="AppBgBrush" Color="{DynamicResource AppBgColor}"/>
+     <SolidColorBrush x:Key="CardBgBrush" Color="{DynamicResource CardBgColor}"/>
+     <SolidColorBrush x:Key="TextPrimaryBrush" Color="{DynamicResource TextPrimaryColor}"/>
+     <SolidColorBrush x:Key="TextSecondaryBrush" Color="{DynamicResource TextSecondaryColor}"/>
+     <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="{DynamicResource TextOnPrimary}"/>
+     <SolidColorBrush x:Key="SidebarTextBrush" Color="{DynamicResource SidebarTextColor}"/>
+     <SolidColorBrush x:Key="SidebarActiveTextBrush" Color="{DynamicResource SidebarActiveTextColor}"/>
+     <SolidColorBrush x:Key="SuccessBrush" Color="{DynamicResource SuccessColor}"/>
+     <SolidColorBrush x:Key="DangerBrush" Color="{DynamicResource DangerColor}"/>
+     <SolidColorBrush x:Key="WarningBrush" Color="{DynamicResource WarningColor}"/>
+     <SolidColorBrush x:Key="InfoBrush" Color="{DynamicResource InfoColor}"/>
+     <SolidColorBrush x:Key="BorderBrush_" Color="{DynamicResource BorderColor}"/>
+     <SolidColorBrush x:Key="TransparentBrush" Color="Transparent"/>
 </ResourceDictionary>
