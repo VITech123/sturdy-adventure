@@ -139,18 +139,162 @@ namespace EnterpriseWorkReport.Views.Dialogs
                     {
                         ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
                     });
+
+                    // Read ALL sheets and combine
                     foreach (DataTable table in ds.Tables)
                     {
+                        string sheetName = table.TableName;
+                        Console.WriteLine($"[ImportAttendance] Reading sheet: {sheetName}");
+                        
                         var headers = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                        foreach (var h in headers) if (!_mainDataTable.Columns.Contains(h)) _mainDataTable.Columns.Add(h);
+                        
+                        // Ensure we have a Month column for sheet-based month extraction
+                        if (!_mainDataTable.Columns.Contains("SheetSource"))
+                            _mainDataTable.Columns.Add("SheetSource");
+                        if (!_mainDataTable.Columns.Contains("Month"))
+                            _mainDataTable.Columns.Add("Month");
+                        
+                        foreach (var h in headers)
+                            if (!_mainDataTable.Columns.Contains(h))
+                                _mainDataTable.Columns.Add(h);
+
                         foreach (DataRow sourceRow in table.Rows)
                         {
                             if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
                             var newRow = _mainDataTable.NewRow();
                             foreach (var col in headers) newRow[col] = sourceRow[col];
-                            if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString())) newRow["Name"] = fileName;
+                            
+                            // Store sheet name for month extraction
+                            newRow["SheetSource"] = sheetName;
+                            
+                            // Try extract month from sheet name if Month column is empty
+                            if (string.IsNullOrWhiteSpace(newRow["Month"]?.ToString()))
+                            {
+                                // Sheet name like "January", "Jan-2025", "2025-01"
+                                string monthFromSheet = ExtractMonthFromSheetName(sheetName);
+                                if (!string.IsNullOrEmpty(monthFromSheet))
+                                {
+                                    newRow["Month"] = monthFromSheet;
+                                }
+                            }
+                            
+                            // If Name is empty, use sheet name as hint
+                            if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString()))
+                                newRow["Name"] = sheetName;
+                                
                             _mainDataTable.Rows.Add(newRow);
                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Password handling...
+                if (ex.Message.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0
+                    || ex.Message.IndexOf("encrypt", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var pwdDialog = new PasswordDialog();
+                    if (pwdDialog.ShowDialog() == true)
+                    {
+                        string password = pwdDialog.Password;
+                        using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        {
+                            var config = new ExcelReaderConfiguration { Password = password };
+                            using (var reader = ExcelReaderFactory.CreateReader(stream, config))
+                            {
+                                var ds = reader.AsDataSet(new ExcelDataSetConfiguration
+                                {
+                                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                                });
+
+                                foreach (DataTable table in ds.Tables)
+                                {
+                                    string sheetName = table.TableName;
+                                    var headers = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+                                    if (!_mainDataTable.Columns.Contains("SheetSource"))
+                                        _mainDataTable.Columns.Add("SheetSource");
+                                    if (!_mainDataTable.Columns.Contains("Month"))
+                                        _mainDataTable.Columns.Add("Month");
+                                        
+                                    foreach (var h in headers)
+                                        if (!_mainDataTable.Columns.Contains(h))
+                                            _mainDataTable.Columns.Add(h);
+
+                                    foreach (DataRow sourceRow in table.Rows)
+                                    {
+                                        if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
+                                        var newRow = _mainDataTable.NewRow();
+                                        foreach (var col in headers) newRow[col] = sourceRow[col];
+                                        newRow["SheetSource"] = sheetName;
+                                        if (string.IsNullOrWhiteSpace(newRow["Month"]?.ToString()))
+                                        {
+                                            string monthFromSheet = ExtractMonthFromSheetName(sheetName);
+                                            if (!string.IsNullOrEmpty(monthFromSheet))
+                                                newRow["Month"] = monthFromSheet;
+                                        }
+                                        if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString()))
+                                            newRow["Name"] = sheetName;
+                                        _mainDataTable.Rows.Add(newRow);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Password required to read encrypted Excel file.");
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        private string ExtractMonthFromSheetName(string sheetName)
+        {
+            if (string.IsNullOrWhiteSpace(sheetName)) return null;
+            
+            sheetName = sheetName.Trim();
+            
+            // Try parse as month name: "January", "Jan", "JAN"
+            string[] monthNames = { "january", "february", "march", "april", "may", "june", 
+                                   "july", "august", "september", "october", "november", "december" };
+            string lower = sheetName.ToLower();
+            
+            for (int i = 0; i < monthNames.Length; i++)
+            {
+                if (lower.Contains(monthNames[i]) || lower.StartsWith(monthNames[i].Substring(0, 3)))
+                {
+                    // Return as year-month format assuming current year if not specified
+                    var now = DateTime.Now;
+                    return $"{now:yyyy}-{(i+1):D2}";
+                }
+            }
+            
+            // Try parse as "Jan-2025", "2025-01", "01/2025"
+            var match = System.Text.RegularExpressions.Regex.Match(sheetName, @"(\d{4})[-/]?(\d{1,2})");
+            if (match.Success && match.Groups.Count >= 3)
+            {
+                int year = int.Parse(match.Groups[1].Value);
+                int month = int.Parse(match.Groups[2].Value);
+                if (year >= 2000 && month >= 1 && month <= 12)
+                    return $"{year}-{month:D2}";
+            }
+            
+            // Try "MM/YYYY" or "MM-YYYY"
+            match = System.Text.RegularExpressions.Regex.Match(sheetName, @"(\d{1,2})[-/](\d{4})");
+            if (match.Success && match.Groups.Count >= 3)
+            {
+                int month = int.Parse(match.Groups[1].Value);
+                int year = int.Parse(match.Groups[2].Value);
+                if (year >= 2000 && month >= 1 && month <= 12)
+                    return $"{year}-{month:D2}";
+            }
+            
+            return null;
+        }
                     }
                 }
             }
@@ -172,16 +316,22 @@ namespace EnterpriseWorkReport.Views.Dialogs
                                 {
                                     ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
                                 });
+
                                 foreach (DataTable table in ds.Tables)
                                 {
+                                    string sheetName = table.TableName;
                                     var headers = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                                    foreach (var h in headers) if (!_mainDataTable.Columns.Contains(h)) _mainDataTable.Columns.Add(h);
+                                    foreach (var h in headers)
+                                        if (!_mainDataTable.Columns.Contains(h))
+                                            _mainDataTable.Columns.Add(h);
+
                                     foreach (DataRow sourceRow in table.Rows)
                                     {
                                         if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
                                         var newRow = _mainDataTable.NewRow();
                                         foreach (var col in headers) newRow[col] = sourceRow[col];
-                                        if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString())) newRow["Name"] = fileName;
+                                        if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString()))
+                                            newRow["Name"] = sheetName;
                                         _mainDataTable.Rows.Add(newRow);
                                     }
                                 }

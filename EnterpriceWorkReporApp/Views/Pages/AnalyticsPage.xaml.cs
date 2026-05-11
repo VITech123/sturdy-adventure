@@ -201,7 +201,7 @@ namespace EnterpriseWorkReport.Views.Pages
             using var conn = DatabaseService.GetConnection();
             bool isAdmin = SessionManager.IsAdmin;
 
-            // Load Master Data Summary
+            // Load Master Data Summary (overall totals)
             var summary = _masterDataService.GetSummary(_selectedProjectId, _fromDate, _toDate);
             TotalManifestsText.Text = summary.TotalManifests.ToString("N0");
             TotalObjectsText.Text = summary.TotalObjects.ToString("N0");
@@ -214,15 +214,25 @@ namespace EnterpriseWorkReport.Views.Pages
             HoldCountText.Text = summary.HoldCount.ToString("N0");
             ErrorCountText.Text = summary.ErrorCount.ToString("N0");
 
-            // Today's Manifest Count
-            int todayManifestCount = _masterDataService.GetTodayManifestCount(_selectedProjectId);
-            TodayManifestsText.Text = todayManifestCount.ToString("N0");
+            // Get comparison data for TODAY: Received (Date col) vs Shipped (Batch col)
+            var todayComparison = _masterDataService.GetTodayComparison(_selectedProjectId);
+            
+            // Update comparison KPI cards
+            ReceivedManifestsText.Text = todayComparison.ReceivedManifests.ToString("N0");
+            ShippedManifestsText.Text = todayComparison.ShippedManifests.ToString("N0");
+            ReceivedObjectsText.Text = todayComparison.ReceivedObjects.ToString("N0");
+            ShippedObjectsText.Text = todayComparison.ShippedObjects.ToString("N0");
 
-            // Load Manifest Details for current date (based on EndDate from batch)
-            var manifestDetails = _masterDataService.GetTodayManifestDetails(_selectedProjectId);
-            ManifestDetailsGrid.ItemsSource = manifestDetails;
+            // Load Manifest Details for both views
+            // RECEIVED (based on Date column - manifest download date)
+            var receivedDetails = _masterDataService.GetTodayReceivedManifestDetails(_selectedProjectId);
+            ReceivedManifestGrid.ItemsSource = receivedDetails;
 
-            // Load Status Breakdown Charts
+            // SHIPPED (based on Batch column - shipment date)
+            var shippedDetails = _masterDataService.GetTodayManifestDetails(_selectedProjectId);
+            ShippedManifestGrid.ItemsSource = shippedDetails;
+
+            // Load Status Breakdown Charts (using all data within date range)
             var statusBreakdown = _masterDataService.GetStatusBreakdown(_selectedProjectId, _fromDate, _toDate);
             LoadStatusCharts(statusBreakdown);
 

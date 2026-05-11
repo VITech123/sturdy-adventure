@@ -27,6 +27,22 @@ namespace EnterpriseWorkReport.Services
                            TimeZone = @TimeZone,
                            LogoPath = @LogoPath,
                            MasterNamesPath = @MasterNamesPath,
+                           QualityReportsPath = @QualityReportsPath,
+                           AttachmentsPath = @AttachmentsPath,
+                           ProfilePicturesPath = @ProfilePicturesPath,
+                           QualityThreshold = @QualityThreshold,
+                           LateArrivalThreshold = @LateArrivalThreshold,
+                           EarlyDepartureThreshold = @EarlyDepartureThreshold,
+                           WorkStartTime = @WorkStartTime,
+                           WorkEndTime = @WorkEndTime,
+                           CloudDbHost = @CloudDbHost,
+                           CloudDbPort = @CloudDbPort,
+                           CloudDbName = @CloudDbName,
+                           CloudDbUsername = @CloudDbUsername,
+                           CloudDbPasswordEncrypted = @CloudDbPasswordEncrypted,
+                           CloudSyncEnabled = @CloudSyncEnabled,
+                           LastCloudSyncAt = @LastCloudSyncAt,
+                           LastCloudSyncStatus = @LastCloudSyncStatus,
                            UpdatedAt = CURRENT_TIMESTAMP
                            WHERE Id = 1";
                 conn.Execute(sql, settings);

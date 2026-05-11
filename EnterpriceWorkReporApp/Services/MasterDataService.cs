@@ -176,57 +176,71 @@ namespace EnterpriseWorkReport.Services
                      int articles = GetIntValue(row, "Articles", "Article_Count", "articles", "article_count", "ARTICLE_COUNT", "article", "ARTICLES", "artcount");
                      int characters = GetIntValue(row, "Charactercount", "Character_Count", "Characters", "CharacterCount", "character_count", "CHARACTER_COUNT", "charcount", "chars", "CHARACTERS", "CharacterCount", "No_of_Chars", "CharCount");
                     
-                    string rawBatch = GetColumnValue(row, "Batch", "Batch_No", "BatchNumber", "batch_no", "batch");
-                    string status = GetColumnValue(row, "Status", "status");
-                    double quality = GetDoubleValue(row, "Quality", "QualityScore", "Quality_Score", "quality");
-                    string errorDetails = GetColumnValue(row, "Error", "Error_Details", "ErrorDetails", "error");
+                     string rawBatch = GetColumnValue(row, "Batch", "Batch_No", "BatchNumber", "batch_no", "batch");
+                     string status = GetColumnValue(row, "Status", "status");
+                     double quality = GetDoubleValue(row, "Quality", "QualityScore", "Quality_Score", "quality");
+                     string errorDetails = GetColumnValue(row, "Error", "Error_Details", "ErrorDetails", "error");
+                     
+                     // Debug logging for zero pages/characters
+                     if (pages == 0 || characters == 0)
+                     {
+                         string objId = GetColumnValue(row, "Object_ID", "ObjectId", "Object ID", "object_Id");
+                         System.Diagnostics.Debug.WriteLine($"[MasterDataService] Row import - ObjectID={objId}, Pages={pages}, Chars={characters}, Batch='{rawBatch}', ColsAvailable: {string.Join(",", row.Table.Columns.Cast<DataColumn>().Select(c=>c.ColumnName))}");
+                     }
 
-                    DateTime? startDate = GetDateValue(row, "Start_Date", "StartDate", "Start Date", "start_date");
-                    DateTime? endDate = GetDateValue(row, "End_Date", "EndDate", "End Date", "end_date");
-                    string assignedUser = GetColumnValue(row, "NAME", "Assigned_To", "AssignedTo", "AssignedToName", "User", "Assigned Name", "assigned_to");
+                     DateTime? startDate = GetDateValue(row, "Start_Date", "StartDate", "Start Date", "start_date");
+                     DateTime? endDate = GetDateValue(row, "End_Date", "EndDate", "End Date", "end_date");
+                     string assignedUser = GetColumnValue(row, "NAME", "Assigned_To", "AssignedTo", "AssignedToName", "User", "Assigned Name", "assigned_to");
 
-                    // 1. Shipment Date Extraction from Batch (e.g., Gamma143 - Shipment1 - 20260307)
-                    // IMPORTANT: Date should ALWAYS come from Batch column for work report dating, NOT from Date column
-                    DateTime? shipmentDate = null;
-                    string rawBatch = GetColumnValue(row, "Batch", "Batch_No", "BatchNumber", "batch_no", "batch");
-                    
-                    if (!string.IsNullOrEmpty(rawBatch))
-                    {
-                        var match = Regex.Match(rawBatch, @"(\d{8})"); // Look for yyyyMMdd pattern
-                        if (match.Success && DateTime.TryParseExact(match.Value, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out var d))
-                        {
-                            shipmentDate = d;
-                        }
-                    }
-                    
-                    // Fallback: if no 8-digit in batch, try 6-digit format (yymmdd) or other patterns
-                    if (!shipmentDate.HasValue && !string.IsNullOrEmpty(rawBatch))
-                    {
-                        var match6 = Regex.Match(rawBatch, @"(\d{6})"); // yymmdd pattern
-                        if (match6.Success && match6.Value.Length == 6)
-                        {
-                            string year = "20" + match6.Value.Substring(0, 2); // Assume 20xx
-                            string month = match6.Value.Substring(2, 2);
-                            string day = match6.Value.Substring(4, 2);
-                            if (DateTime.TryParseExact($"{year}{month}{day}", "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out var d2))
-                            {
-                                shipmentDate = d2;
-                            }
-                        }
-                    }
-                    
-                    // If still no date from batch, that's an error - we need the date for work reports
-                    if (!shipmentDate.HasValue)
-                    {
-                        // Log warning but continue - EndDate will be null/import date
-                        System.Diagnostics.Debug.WriteLine($"Warning: Could not extract date from Batch column: '{rawBatch}'. Object ID: {GetColumnValue(row, "Object_ID", "ObjectId", "Object ID", "object_Id")}");
-                    }
-                    
-                    // Use shipment date as EndDate (the date work should be reported for)
-                    // Also use as StartDate if StartDate is not provided separately
-                    DateTime? startDate = GetDateValue(row, "Start_Date", "StartDate", "Start Date", "start_date");
-                    if (!startDate.HasValue) startDate = shipmentDate;
-                    DateTime? endDate = shipmentDate; // Always prefer batch date
+                     // 1. Received Date from Date column (manifest download date)
+                     DateTime? receivedDate = GetDateValue(row, "Date", "DATE", "DownloadDate", "Download_Date", "ReceivedDate", "Received_Date");
+                     
+                     // 2. Shipment/Finish Date from Batch column (extract yyyyMMdd)
+                     DateTime? shipmentDate = null;
+                     string rawBatch = GetColumnValue(row, "Batch", "Batch_No", "BatchNumber", "batch_no", "batch");
+                     
+                     if (!string.IsNullOrEmpty(rawBatch))
+                     {
+                         // Try 8-digit yyyyMMdd
+                         var match = Regex.Match(rawBatch, @"(\d{8})");
+                         if (match.Success && DateTime.TryParseExact(match.Value, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out var d))
+                         {
+                             shipmentDate = d;
+                         }
+                         else
+                         {
+                             // Try 6-digit yymmdd
+                             var match6 = Regex.Match(rawBatch, @"(\d{6})");
+                             if (match6.Success && match6.Value.Length == 6)
+                             {
+                                 string year = "20" + match6.Value.Substring(0, 2);
+                                 string month = match6.Value.Substring(2, 2);
+                                 string day = match6.Value.Substring(4, 2);
+                                 if (DateTime.TryParseExact($"{year}{month}{day}", "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out var d2))
+                                 {
+                                     shipmentDate = d2;
+                                 }
+                             }
+                         }
+                     }
+                     
+                     if (!shipmentDate.HasValue)
+                     {
+                         string objId = GetColumnValue(row, "Object_ID", "ObjectId", "Object ID", "object_Id");
+                         System.Diagnostics.Debug.WriteLine($"[MasterDataService] WARNING: Could not extract valid date from Batch '{rawBatch}' for ObjectID: {objId}. EndDate will be null.");
+                     }
+                     
+                     // Fallback: If no date from Date column, use shipment date or ImportDate
+                     if (!receivedDate.HasValue)
+                     {
+                         receivedDate = shipmentDate ?? DateTime.Now;
+                     }
+                     
+                     // Use shipment date as EndDate (the date work was finished/shipped)
+                     // StartDate from the file if available, else shipment date
+                     DateTime? startDate = GetDateValue(row, "Start_Date", "StartDate", "Start Date", "start_date");
+                     if (!startDate.HasValue) startDate = shipmentDate;
+                     DateTime? endDate = shipmentDate;
 
                     // 2. Status Resolution Logic based on User requirements
                     string resolvedStatus = "Unassigned";
@@ -268,15 +282,18 @@ namespace EnterpriseWorkReport.Services
 
                     conn.Execute(@"
                         INSERT INTO MasterData 
-                        (ProjectId, ManifestId, ObjectId, ObjectName, Pages, Articles, CharacterCount, StartDate, EndDate, Status, Batch, QualityScore, AssignedUserName, ErrorDetails, ExtraData, ImportDate)
+                        (ProjectId, ManifestId, ObjectId, ObjectName, Pages, Articles, CharacterCount, StartDate, EndDate, ReceivedDate, Status, Batch, QualityScore, AssignedUserName, ErrorDetails, ExtraData, ImportDate)
                         VALUES 
-                        (@ProjectId, @ManifestId, @ObjectId, @ObjectName, @Pages, @Articles, @CharacterCount, @StartDate, @EndDate, @Status, @Batch, @QualityScore, @AssignedUserName, @ErrorDetails, @ExtraData, @ImportDate)
+                        (@ProjectId, @ManifestId, @ObjectId, @ObjectName, @Pages, @Articles, @CharacterCount, @StartDate, @EndDate, @ReceivedDate, @Status, @Batch, @QualityScore, @AssignedUserName, @ErrorDetails, @ExtraData, @ImportDate)
                         ON CONFLICT (ProjectId, ObjectId) DO UPDATE SET
                         ManifestId = EXCLUDED.ManifestId,
                         ObjectName = EXCLUDED.ObjectName,
                         Pages = EXCLUDED.Pages,
                         Articles = EXCLUDED.Articles,
                         CharacterCount = EXCLUDED.CharacterCount,
+                        StartDate = EXCLUDED.StartDate,
+                        EndDate = EXCLUDED.EndDate,
+                        ReceivedDate = EXCLUDED.ReceivedDate,
                         Status = EXCLUDED.Status,
                         Batch = EXCLUDED.Batch,
                         QualityScore = EXCLUDED.QualityScore,
@@ -295,6 +312,7 @@ namespace EnterpriseWorkReport.Services
                             CharacterCount = characters,
                             StartDate = startDate,
                             EndDate = endDate,
+                            ReceivedDate = receivedDate,
                             Status = resolvedStatus,
                             Batch = rawBatch,
                             QualityScore = quality,
@@ -573,6 +591,61 @@ namespace EnterpriseWorkReport.Services
                 {where}
                 GROUP BY ManifestId
                 ORDER BY ManifestId", new { ProjectId = projectId }).ToList();
+        }
+
+        // NEW: Get manifests received today (based on ReceivedDate from Date column)
+        public List<ManifestDetail> GetTodayReceivedManifestDetails(int? projectId = null)
+        {
+            using var conn = DatabaseService.GetConnection();
+            string where = "WHERE DATE(COALESCE(ReceivedDate, ImportDate)) = CURRENT_DATE";
+            if (projectId.HasValue) where += " AND ProjectId = @ProjectId";
+
+            return conn.Query<ManifestDetail>(@$"
+                SELECT 
+                    ManifestId,
+                    COUNT(*) AS ObjectCount,
+                    SUM(Pages) AS TotalPages,
+                    SUM(CASE WHEN Status = 'Finished' THEN 1 ELSE 0 END) AS FinishedCount,
+                    SUM(CASE WHEN Status = 'Shipped' THEN 1 ELSE 0 END) AS ShippedCount,
+                    SUM(CASE WHEN Status = 'Pending' THEN 1 ELSE 0 END) AS PendingCount,
+                    SUM(CASE WHEN Status = 'Error' THEN 1 ELSE 0 END) AS ErrorCount,
+                    SUM(CASE WHEN Status = 'Hold' THEN 1 ELSE 0 END) AS HoldCount,
+                    SUM(CASE WHEN Status = 'Unassigned' OR Status IS NULL THEN 1 ELSE 0 END) AS UnassignedCount
+                FROM MasterData
+                {where}
+                GROUP BY ManifestId
+                ORDER BY ManifestId", new { ProjectId = projectId }).ToList();
+        }
+
+        public int GetTodayReceivedManifestCount(int? projectId = null)
+        {
+            using var conn = DatabaseService.GetConnection();
+            string where = projectId.HasValue ? "WHERE ProjectId = @ProjectId AND DATE(COALESCE(ReceivedDate, ImportDate)) = CURRENT_DATE" : "WHERE DATE(COALESCE(ReceivedDate, ImportDate)) = CURRENT_DATE";
+            return conn.ExecuteScalar<int>($"SELECT COUNT(DISTINCT ManifestId) FROM MasterData {where}", new { ProjectId = projectId });
+        }
+
+        // Comparison: Get both received and shipped counts for today side-by-side
+        public (int ReceivedManifests, int ShippedManifests, int ReceivedObjects, int ShippedObjects) GetTodayComparison(int? projectId = null)
+        {
+            using var conn = DatabaseService.GetConnection();
+            string projectFilter = projectId.HasValue ? "AND ProjectId = @ProjectId" : "";
+            
+            var result = conn.QueryFirstOrDefault(@$"
+                SELECT 
+                    COUNT(DISTINCT CASE WHEN DATE(COALESCE(ReceivedDate, ImportDate)) = CURRENT_DATE THEN ManifestId END) as ReceivedManifests,
+                    COUNT(DISTINCT CASE WHEN DATE(COALESCE(EndDate, ImportDate)) = CURRENT_DATE THEN ManifestId END) as ShippedManifests,
+                    COUNT(CASE WHEN DATE(COALESCE(ReceivedDate, ImportDate)) = CURRENT_DATE THEN 1 END) as ReceivedObjects,
+                    COUNT(CASE WHEN DATE(COALESCE(EndDate, ImportDate)) = CURRENT_DATE THEN 1 END) as ShippedObjects
+                FROM MasterData
+                WHERE 1=1 {projectFilter}",
+                new { ProjectId = projectId });
+
+            return (
+                ReceivedManifests: result?.receivedmanifests ?? 0,
+                ShippedManifests: result?.shippedmanifests ?? 0,
+                ReceivedObjects: result?.receivedobjects ?? 0,
+                ShippedObjects: result?.shippedobjects ?? 0
+            );
         }
     }
 
