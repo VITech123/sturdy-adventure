@@ -452,6 +452,87 @@
                 </StackPanel>
             </Border>
 
+            <!-- Cloud Database Sync - Admin Only -->
+            <Border x:Name="CloudSyncSection" Style="{DynamicResource CardBorder}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="☁️ Cloud Database Synchronization" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                    <TextBlock Text="Configure remote cloud PostgreSQL database for automatic backup and multi-location sync."
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,16"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Column="0" Grid.Row="0" Margin="0,0,8,12">
+                            <TextBlock Text="Host" Style="{DynamicResource FieldLabel}"/>
+                            <TextBox x:Name="CloudHostBox" Style="{DynamicResource ModernTextBox}" Width="200"
+                                     ToolTip="Cloud PostgreSQL host (e.g., db.example.com)"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,0,12">
+                            <TextBlock Text="Port" Style="{DynamicResource FieldLabel}"/>
+                            <TextBox x:Name="CloudPortBox" Style="{DynamicResource ModernTextBox}" Width="100"
+                                     Text="5432" ToolTip="PostgreSQL port (default: 5432)"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="0" Grid.Row="1" Margin="0,0,8,12">
+                            <TextBlock Text="Database Name" Style="{DynamicResource FieldLabel}"/>
+                            <TextBox x:Name="CloudDbNameBox" Style="{DynamicResource ModernTextBox}" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,0,12">
+                            <TextBlock Text="Username" Style="{DynamicResource FieldLabel}"/>
+                            <TextBox x:Name="CloudUsernameBox" Style="{DynamicResource ModernTextBox}" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="0" Grid.Row="2" Margin="0,0,8,12">
+                            <TextBlock Text="Password" Style="{DynamicResource FieldLabel}"/>
+                            <PasswordBox x:Name="CloudPasswordBox" Style="{DynamicResource ModernPasswordBox}" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Grid.Row="2" Margin="0,0,0,12">
+                            <CheckBox x:Name="CloudSyncEnableCheck" Content="Enable automatic cloud sync" 
+                                      Style="{DynamicResource ModernCheckBox}" VerticalAlignment="Center" Margin="0,24,0,0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Note: Choose a free PostgreSQL cloud provider (Supabase, Neon, Railway, etc.). No credit card required for free tiers."
+                               FontSize="11" Foreground="{DynamicResource WarningBrush}" Margin="0,0,0,12"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button Content="🔗 Test Connection" Style="{DynamicResource OutlineButton}" 
+                                Padding="15,8" Margin="0,0,10,0" Click="TestCloudConnection_Click"/>
+                        <Button Content="☁️ Sync Now to Cloud" Style="{DynamicResource PrimaryButton}" 
+                                Padding="15,8" Click="CloudSyncNow_Click"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="CloudStatusText" Text="" FontSize="12"
+                               Foreground="{DynamicResource SuccessBrush}" Margin="0,8,0,0"/>
+
+                    <Border Margin="0,16,0,0" Background="#F8FAFC" CornerRadius="8" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Cloud Sync Status" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,8"/>
+                            <TextBlock x:Name="LastCloudSyncText" Text="Last sync: Never"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
+                            <TextBlock x:Name="CloudSyncLog" Text="" 
+                                       FontFamily="Consolas" FontSize="10" TextWrapping="Wrap"
+                                       VerticalScrollBarVisibility="Auto" Height="80" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
             <!-- About -->
             <Border Style="{DynamicResource CardBorder}">
                 <StackPanel>

@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
+using System.Threading.Tasks;
+using EnterpriseWorkReport.Models;
 using EnterpriseWorkReport.Services;
 
 namespace EnterpriseWorkReport
@@ -44,6 +46,9 @@ namespace EnterpriseWorkReport
                 // Initialize database with multi-user support
                 DatabaseService.InitializeDatabase();
                 LogMessage("Database initialized successfully");
+
+                // Start cloud sync automatically if configured (non-blocking)
+                _ = Task.Run(() => StartCloudSyncAsync());
             }
             catch (Exception ex)
             {
@@ -54,6 +59,50 @@ namespace EnterpriseWorkReport
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 Shutdown(1);
+            }
+        }
+
+        private async Task StartCloudSyncAsync()
+        {
+            try
+            {
+                // Small delay to let the app settle
+                await Task.Delay(2000);
+
+                using (var conn = DatabaseService.GetConnection())
+                {
+                    var settings = conn.QueryFirstOrDefault<CompanySettings>("SELECT * FROM CompanySettings WHERE Id = 1");
+                    if (settings != null && settings.CloudSyncEnabled && !string.IsNullOrEmpty(settings.CloudDbHost))
+                    {
+                        var cloudService = new CloudSyncService();
+                        string pwd = settings.CloudDbPassword;
+                        cloudService.ConfigureCloud(
+                            settings.CloudDbHost,
+                            settings.CloudDbPort ?? "5432",
+                            settings.CloudDbName,
+                            settings.CloudDbUsername,
+                            pwd
+                        );
+                        
+                        var result = await cloudService.SyncToCloudAsync();
+                        LogMessage($"Cloud sync result: {result.Message}");
+                        
+                        // Update last sync status in DB
+                        try
+                        {
+                            conn.Execute(@"
+                                UPDATE CompanySettings 
+                                SET LastCloudSyncAt = @Now, LastCloudSyncStatus = @Status 
+                                WHERE Id = 1",
+                                new { Now = DateTime.Now, Status = result.Message });
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, "CloudSyncStartup");
             }
         }
 

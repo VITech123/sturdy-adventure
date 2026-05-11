@@ -175,31 +175,100 @@ namespace EnterpriseWorkReport.Views.Dialogs
         private void AppendExcel(string path)
         {
             string fileName = Path.GetFileNameWithoutExtension(path);
-            using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var reader = ExcelReaderFactory.CreateReader(stream))
+            try
             {
-                var ds = reader.AsDataSet(new ExcelDataSetConfiguration
+                using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
                 {
-                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
-                });
-
-                foreach (DataTable table in ds.Tables)
-                {
-                    var originalHeaders = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                    var mappedHeaders = originalHeaders.Select(h => MapHeader(h)).ToList();
-                    EnsureColumnsExist(mappedHeaders);
-
-                    foreach (DataRow sourceRow in table.Rows)
+                    var ds = reader.AsDataSet(new ExcelDataSetConfiguration
                     {
-                        if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
-                        
-                        var newRow = _mainDataTable.NewRow();
-                        for (int i = 0; i < originalHeaders.Count; i++)
+                        ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                    });
+
+                    foreach (DataTable table in ds.Tables)
+                    {
+                        var originalHeaders = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+                        var mappedHeaders = originalHeaders.Select(h => MapHeader(h)).ToList();
+                        EnsureColumnsExist(mappedHeaders);
+
+                        foreach (DataRow sourceRow in table.Rows)
                         {
-                            string targetCol = mappedHeaders[i];
-                            if (_mainDataTable.Columns.Contains(targetCol))
-                                newRow[targetCol] = sourceRow[originalHeaders[i]];
+                            if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
+                            
+                            var newRow = _mainDataTable.NewRow();
+                            for (int i = 0; i < originalHeaders.Count; i++)
+                            {
+                                string targetCol = mappedHeaders[i];
+                                if (_mainDataTable.Columns.Contains(targetCol))
+                                    newRow[targetCol] = sourceRow[originalHeaders[i]];
+                            }
+
+                            if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString()))
+                                newRow["Name"] = fileName;
+
+                            _mainDataTable.Rows.Add(newRow);
                         }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0
+                    || ex.Message.IndexOf("encrypt", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var pwdDialog = new PasswordDialog();
+                    if (pwdDialog.ShowDialog() == true)
+                    {
+                        string password = pwdDialog.Password;
+                        // Retry with password
+                        using (var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        {
+                            var config = new ExcelReaderConfiguration { Password = password };
+                            using (var reader = ExcelReaderFactory.CreateReader(stream, config))
+                            {
+                                var ds = reader.AsDataSet(new ExcelDataSetConfiguration
+                                {
+                                    ConfigureDataTable = _ => new ExcelDataTableConfiguration { UseHeaderRow = true }
+                                });
+
+                                foreach (DataTable table in ds.Tables)
+                                {
+                                    var originalHeaders = table.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+                                    var mappedHeaders = originalHeaders.Select(h => MapHeader(h)).ToList();
+                                    EnsureColumnsExist(mappedHeaders);
+
+                                    foreach (DataRow sourceRow in table.Rows)
+                                    {
+                                        if (sourceRow.ItemArray.All(v => v == null || string.IsNullOrWhiteSpace(v.ToString()))) continue;
+                                        
+                                        var newRow = _mainDataTable.NewRow();
+                                        for (int i = 0; i < originalHeaders.Count; i++)
+                                        {
+                                            string targetCol = mappedHeaders[i];
+                                            if (_mainDataTable.Columns.Contains(targetCol))
+                                                newRow[targetCol] = sourceRow[originalHeaders[i]];
+                                        }
+
+                                        if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString()))
+                                            newRow["Name"] = fileName;
+
+                                        _mainDataTable.Rows.Add(newRow);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Password required to read encrypted Excel file.");
+                    }
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
                         // If Name is empty and we have a filename hint, use it
                         if (string.IsNullOrWhiteSpace(newRow["Name"]?.ToString()))

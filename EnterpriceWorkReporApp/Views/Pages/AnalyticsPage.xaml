@@ -43,7 +43,7 @@
             </Border>
 
             <!-- KPI Cards Row 1: Master Data Stats -->
-            <UniformGrid Columns="5" Margin="0,0,0,16">
+            <UniformGrid Columns="6" Margin="0,0,0,16">
                 <Border Style="{DynamicResource CardBorder}" Margin="0,0,8,0">
                     <StackPanel>
                         <TextBlock Text="📋" FontSize="28"/>
@@ -76,12 +76,20 @@
                         <TextBlock Text="Total Articles" Style="{DynamicResource FieldLabel}"/>
                     </StackPanel>
                 </Border>
-                <Border Style="{DynamicResource CardBorder}" Margin="8,0,0,0">
+                <Border Style="{DynamicResource CardBorder}" Margin="4,0">
                     <StackPanel>
                         <TextBlock Text="✍" FontSize="28" Foreground="{DynamicResource AccentBrush}"/>
                         <TextBlock x:Name="TotalCharactersText" Text="0" FontSize="28" FontWeight="Bold"
                                    Foreground="{DynamicResource AccentBrush}" Margin="0,8,0,4"/>
                         <TextBlock Text="Total Characters" Style="{DynamicResource FieldLabel}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{DynamicResource CardBorder}" Margin="8,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="📅" FontSize="28" Foreground="{DynamicResource InfoBrush}"/>
+                        <TextBlock x:Name="TodayManifestsText" Text="0" FontSize="28" FontWeight="Bold"
+                                   Foreground="{DynamicResource InfoBrush}" Margin="0,8,0,4"/>
+                        <TextBlock Text="Today's Manifests" Style="{DynamicResource FieldLabel}"/>
                     </StackPanel>
                 </Border>
             </UniformGrid>

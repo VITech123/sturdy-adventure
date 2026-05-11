@@ -121,7 +121,29 @@ namespace EnterpriseWorkReport.Views.Pages
                 if (settings != null && !string.IsNullOrEmpty(settings.MasterNamesPath))
                     nameMatcher.LoadMasterNames(settings.MasterNamesPath);
 
-                int imported = _masterDataService.SyncMasterFile(project.Id, project.MasterFilePath, true, project.MasterFilePassword, nameMatcher);
+                int imported = 0;
+                try
+                {
+                    imported = _masterDataService.SyncMasterFile(project.Id, project.MasterFilePath, true, project.MasterFilePassword, nameMatcher);
+                }
+                catch (Exception ex) when (ex.Message.IndexOf("password", StringComparison.OrdinalIgnoreCase) >= 0 || ex.Message.IndexOf("encrypt", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    var pwdDialog = new PasswordDialog();
+                    if (pwdDialog.ShowDialog() == true)
+                    {
+                        string pwd = pwdDialog.Password;
+                        // Update stored password (encrypted)
+                        string encrypted = SecretService.EncryptSecret(pwd);
+                        conn.Execute("UPDATE Projects SET MasterFilePassword = @P WHERE Id = @Id", new { P = encrypted, Id = project.Id });
+                        // Retry with new password
+                        imported = _masterDataService.SyncMasterFile(project.Id, project.MasterFilePath, true, pwd, nameMatcher);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Password required to sync master file.", "Cancelled", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+                }
 
                 MessageBox.Show($"✅ Sync Complete! Imported {imported} records.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadData();
@@ -179,7 +201,7 @@ namespace EnterpriseWorkReport.Views.Pages
             using var conn = DatabaseService.GetConnection();
             bool isAdmin = SessionManager.IsAdmin;
 
-            // Load Master Data Summary
+            // Load Master Data Summary (overall totals)
             var summary = _masterDataService.GetSummary(_selectedProjectId, _fromDate, _toDate);
             TotalManifestsText.Text = summary.TotalManifests.ToString("N0");
             TotalObjectsText.Text = summary.TotalObjects.ToString("N0");
@@ -192,12 +214,25 @@ namespace EnterpriseWorkReport.Views.Pages
             HoldCountText.Text = summary.HoldCount.ToString("N0");
             ErrorCountText.Text = summary.ErrorCount.ToString("N0");
 
-            // Load Manifest Details for current date
-            var currentDate = DateTime.Today;
-            var manifestDetails = _masterDataService.GetManifestDetails(_selectedProjectId, currentDate);
-            ManifestDetailsGrid.ItemsSource = manifestDetails;
+            // Get comparison data for TODAY: Received (Date col) vs Shipped (Batch col)
+            var todayComparison = _masterDataService.GetTodayComparison(_selectedProjectId);
+            
+            // Update comparison KPI cards
+            ReceivedManifestsText.Text = todayComparison.ReceivedManifests.ToString("N0");
+            ShippedManifestsText.Text = todayComparison.ShippedManifests.ToString("N0");
+            ReceivedObjectsText.Text = todayComparison.ReceivedObjects.ToString("N0");
+            ShippedObjectsText.Text = todayComparison.ShippedObjects.ToString("N0");
 
-            // Load Status Breakdown Charts
+            // Load Manifest Details for both views
+            // RECEIVED (based on Date column - manifest download date)
+            var receivedDetails = _masterDataService.GetTodayReceivedManifestDetails(_selectedProjectId);
+            ReceivedManifestGrid.ItemsSource = receivedDetails;
+
+            // SHIPPED (based on Batch column - shipment date)
+            var shippedDetails = _masterDataService.GetTodayManifestDetails(_selectedProjectId);
+            ShippedManifestGrid.ItemsSource = shippedDetails;
+
+            // Load Status Breakdown Charts (using all data within date range)
             var statusBreakdown = _masterDataService.GetStatusBreakdown(_selectedProjectId, _fromDate, _toDate);
             LoadStatusCharts(statusBreakdown);
 

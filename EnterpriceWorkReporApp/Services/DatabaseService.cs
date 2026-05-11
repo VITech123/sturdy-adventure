@@ -62,6 +62,7 @@ namespace EnterpriseWorkReport.Services
             // Migrations
             try { connection.Execute("ALTER TABLE MasterData ADD COLUMN IF NOT EXISTS ExtraData TEXT;"); } catch { }
             try { connection.Execute("ALTER TABLE MasterData ADD COLUMN IF NOT EXISTS ProjectId INTEGER;"); } catch { }
+            try { connection.Execute("ALTER TABLE MasterData ADD COLUMN IF NOT EXISTS ReceivedDate DATE;"); } catch { }
             try { connection.Execute("ALTER TABLE QualityReports ADD COLUMN IF NOT EXISTS ProjectId INTEGER;"); } catch { }
             try { connection.Execute("ALTER TABLE QualityReports ADD COLUMN IF NOT EXISTS IsDetailed INTEGER DEFAULT 0;"); } catch { }
             try { connection.Execute("ALTER TABLE Projects ADD COLUMN IF NOT EXISTS MasterFilePassword TEXT;"); } catch { }
@@ -426,6 +427,47 @@ namespace EnterpriseWorkReport.Services
             addCol("Resumes", "FolderId", "INTEGER");
             addCol("Resumes", "ThumbnailPath", "TEXT");
             
+            // Cloud Sync Settings
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS CloudDbHost TEXT;"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS CloudDbPort TEXT DEFAULT '5432';"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS CloudDbName TEXT;"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS CloudDbUsername TEXT;"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS CloudDbPasswordEncrypted TEXT;"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS CloudSyncEnabled BOOLEAN DEFAULT FALSE;"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS LastCloudSyncAt TIMESTAMP;"); } catch { }
+            try { connection.Execute("ALTER TABLE CompanySettings ADD COLUMN IF NOT EXISTS LastCloudSyncStatus TEXT;"); } catch { }
+
+            // Daily Statistics Table
+            try
+            {
+                connection.Execute(@"
+                    CREATE TABLE IF NOT EXISTS DailyStatistics (
+                        Id SERIAL PRIMARY KEY,
+                        StatDate DATE NOT NULL,
+                        ProjectId INTEGER,
+                        ProjectName TEXT,
+                        TotalManifests INTEGER DEFAULT 0,
+                        DistinctManifests INTEGER DEFAULT 0,
+                        TotalObjects INTEGER DEFAULT 0,
+                        FinishedCount INTEGER DEFAULT 0,
+                        ShippedCount INTEGER DEFAULT 0,
+                        PendingCount INTEGER DEFAULT 0,
+                        ErrorCount INTEGER DEFAULT 0,
+                        HoldCount INTEGER DEFAULT 0,
+                        UnassignedCount INTEGER DEFAULT 0,
+                        TotalPages INTEGER DEFAULT 0,
+                        TotalArticles INTEGER DEFAULT 0,
+                        TotalCharacters INTEGER DEFAULT 0,
+                        WorkReportsCount INTEGER DEFAULT 0,
+                        WorkReportsBilling REAL DEFAULT 0,
+                        CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        UpdatedAt TIMESTAMP,
+                        UNIQUE(StatDate, ProjectId)
+                    );
+                ");
+            }
+            catch { }
+            
             try {
                 using (var cmd = new NpgsqlCommand("CREATE UNIQUE INDEX IF NOT EXISTS idx_attendance_user_date ON Attendance(UserId, Date)", connection))
                     cmd.ExecuteNonQuery();
@@ -511,21 +553,44 @@ namespace EnterpriseWorkReport.Services
             }
         }
 
-        public static void ClearAllData()
+        public static void ClearAllData(bool preserveUsers = false)
         {
-            // Dropping tables completely would clear postgres data, a bit riskier in production but ok for reset
             using (var connection = GetConnection())
             {
-                string dropQuery = @"
-                    DROP SCHEMA public CASCADE;
-                    CREATE SCHEMA public;
-                ";
-                using (var cmd = new NpgsqlCommand(dropQuery, connection))
+                if (preserveUsers)
                 {
-                    cmd.ExecuteNonQuery();
+                    // Selective delete: clear everything except Users and core settings
+                    string[] tables = new string[]
+                    {
+                        "WorkReports", "WorkReportItems", "Attendance", "Leaves",
+                        "QualityReports", "QualityReportItems", "AuditLogs", "Messages",
+                        "MasterData", "BillingSummary", "Resumes", "ResumeFolders",
+                        "ProjectFields", "Projects", "CompanySettings", "UserSettings"
+                    };
+                    
+                    foreach (var table in tables)
+                    {
+                        try
+                        {
+                            connection.Execute($"DELETE FROM {table};");
+                        }
+                        catch { }
+                    }
+                }
+                else
+                {
+                    // Full reset - dangerous!
+                    string dropQuery = @"DROP SCHEMA public CASCADE; CREATE SCHEMA public;";
+                    using (var cmd = new NpgsqlCommand(dropQuery, connection))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
                 }
             }
-            InitializeDatabase();
+            
+            // Re-seed essential data
+            SeedInitialAdmin(GetConnection());
+            SeedProjectFormulas(GetConnection());
         }
     }
 }

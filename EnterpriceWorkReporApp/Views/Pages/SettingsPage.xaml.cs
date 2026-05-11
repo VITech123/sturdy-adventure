@@ -9,6 +9,7 @@ using EnterpriseWorkReport.Services;
 using System.Linq;
 using Microsoft.Win32;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EnterpriseWorkReport.Views.Pages
 {
@@ -29,6 +30,7 @@ namespace EnterpriseWorkReport.Views.Pages
                 LanServerSection.Visibility = Visibility.Collapsed;
                 BackupSection.Visibility = Visibility.Collapsed;
                 BackgroundSyncSection.Visibility = Visibility.Collapsed;
+                CloudSyncSection.Visibility = Visibility.Collapsed;
             }
             
             // Load admin data only if admin
@@ -74,6 +76,98 @@ namespace EnterpriseWorkReport.Views.Pages
             catch (Exception ex)
             {
                 SyncStatusText.Text = $"Manual sync failed: {ex.Message}";
+            }
+        }
+
+        private async void TestCloudConnection_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CloudStatusText.Text = "Testing connection...";
+                CloudStatusText.Foreground = (System.Windows.Media.Brush)Application.Current.Resources["WarningBrush"];
+                
+                string host = CloudHostBox.Text.Trim();
+                string port = CloudPortBox.Text.Trim();
+                string db = CloudDbNameBox.Text.Trim();
+                string user = CloudUsernameBox.Text.Trim();
+                string pwd = CloudPasswordBox.Password;
+
+                if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(db) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pwd))
+                {
+                    CloudStatusText.Text = "Please fill in all cloud database fields (host, database, username, password).";
+                    CloudStatusText.Foreground = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"];
+                    return;
+                }
+
+                var cloudService = new CloudSyncService();
+                cloudService.ConfigureCloud(host, port, db, user, pwd);
+                
+                await cloudService.TestConnectionAsync();
+                
+                CloudStatusText.Text = "✓ Connection successful! Cloud database is reachable.";
+                CloudStatusText.Foreground = (System.Windows.Media.Brush)Application.Current.Resources["SuccessBrush"];
+            }
+            catch (Exception ex)
+            {
+                CloudStatusText.Text = $"✕ Connection failed: {ex.Message}";
+                CloudStatusText.Foreground = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"];
+            }
+        }
+
+        private async void CloudSyncNow_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CloudStatusText.Text = "Starting cloud sync...";
+                
+                string host = CloudHostBox.Text.Trim();
+                string port = CloudPortBox.Text.Trim();
+                string db = CloudDbNameBox.Text.Trim();
+                string user = CloudUsernameBox.Text.Trim();
+                string pwd = CloudPasswordBox.Password;
+
+                if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(db) || string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pwd))
+                {
+                    CloudStatusText.Text = "Please configure cloud database credentials first.";
+                    CloudStatusText.Foreground = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"];
+                    return;
+                }
+
+                var cloudService = new CloudSyncService();
+                cloudService.ConfigureCloud(host, port, db, user, pwd);
+                cloudService.SyncLog += (msg) => Dispatcher.Invoke(() => CloudSyncLog.Text += $"[{DateTime.Now:HH:mm:ss}] {msg}\n");
+                
+                var result = await cloudService.SyncToCloudAsync();
+                
+                CloudStatusText.Text = result.Success ? $"✓ {result.Message}" : $"✕ {result.Message}";
+                CloudStatusText.Foreground = result.Success 
+                    ? (System.Windows.Media.Brush)Application.Current.Resources["SuccessBrush"]
+                    : (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"];
+                
+                // Update last sync info
+                LastCloudSyncText.Text = $"Last sync: {DateTime.Now:dd/MM/yyyy HH:mm}";
+                
+                if (result.Success)
+                {
+                    // Save sync status to company settings
+                    try
+                    {
+                        var companyService = new CompanyService();
+                        var settings = companyService.GetSettings();
+                        if (settings != null)
+                        {
+                            settings.LastCloudSyncAt = DateTime.Now;
+                            settings.LastCloudSyncStatus = result.Message;
+                            companyService.UpdateSettings(settings);
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                CloudStatusText.Text = $"✕ Sync failed: {ex.Message}";
+                CloudStatusText.Foreground = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"];
             }
         }
 
@@ -170,6 +264,17 @@ namespace EnterpriseWorkReport.Views.Pages
                 CurrencyBox.Text = settings.CurrencySymbol ?? "₹";
                 MasterNamesPathBox.Text = settings.MasterNamesPath ?? "";
                 
+                // Cloud settings
+                CloudHostBox.Text = settings.CloudDbHost ?? "";
+                CloudPortBox.Text = settings.CloudDbPort ?? "5432";
+                CloudDbNameBox.Text = settings.CloudDbName ?? "";
+                CloudUsernameBox.Text = settings.CloudDbUsername ?? "";
+                if (!string.IsNullOrEmpty(settings.CloudDbPasswordEncrypted))
+                {
+                    CloudPasswordBox.Password = SecretService.DecryptSecret(settings.CloudDbPasswordEncrypted);
+                }
+                CloudSyncEnableCheck.IsChecked = settings.CloudSyncEnabled;
+                
                 _logoPath = settings.LogoPath;
                 if (!string.IsNullOrWhiteSpace(_logoPath) && File.Exists(_logoPath))
                 {
@@ -202,8 +307,12 @@ namespace EnterpriseWorkReport.Views.Pages
             try
             {
                 var companyService = new CompanyService();
+                var existingSettings = companyService.GetSettings();
+                
+                // Merge existing + new UI values
                 var settings = new CompanySettings
                 {
+                    Id = 1,
                     CompanyName = CompanyNameBox.Text.Trim(),
                     CompanyEmail = CompanyEmailBox.Text.Trim(),
                     CompanyPhone = CompanyPhoneBox.Text.Trim(),
@@ -211,7 +320,32 @@ namespace EnterpriseWorkReport.Views.Pages
                     TaxId = TaxIdBox.Text.Trim(),
                     CurrencySymbol = CurrencyBox.Text.Trim(),
                     LogoPath = _logoPath,
-                    MasterNamesPath = MasterNamesPathBox.Text.Trim()
+                    MasterNamesPath = MasterNamesPathBox.Text.Trim(),
+                    
+                    // Preserve existing values for fields not in UI
+                    QualityReportsPath = existingSettings?.QualityReportsPath,
+                    AttachmentsPath = existingSettings?.AttachmentsPath,
+                    ProfilePicturesPath = existingSettings?.ProfilePicturesPath,
+                    QualityThreshold = existingSettings?.QualityThreshold ?? 85,
+                    LateArrivalThreshold = existingSettings?.LateArrivalThreshold,
+                    EarlyDepartureThreshold = existingSettings?.EarlyDepartureThreshold,
+                    WorkStartTime = existingSettings?.WorkStartTime,
+                    WorkEndTime = existingSettings?.WorkEndTime,
+                    
+                    // Cloud settings
+                    CloudDbHost = CloudHostBox.Text.Trim(),
+                    CloudDbPort = CloudPortBox.Text.Trim(),
+                    CloudDbName = CloudDbNameBox.Text.Trim(),
+                    CloudDbUsername = CloudUsernameBox.Text.Trim(),
+                    CloudDbPasswordEncrypted = string.IsNullOrWhiteSpace(CloudPasswordBox.Password) 
+                        ? (existingSettings?.CloudDbPasswordEncrypted)
+                        : SecretService.EncryptSecret(CloudPasswordBox.Password),
+                    CloudSyncEnabled = CloudSyncEnableCheck.IsChecked == true,
+                    LastCloudSyncAt = existingSettings?.LastCloudSyncAt,
+                    LastCloudSyncStatus = existingSettings?.LastCloudSyncStatus,
+                    
+                    // Preserve timestamps
+                    UpdatedAt = DateTime.Now
                 };
                 companyService.UpdateSettings(settings);
                 
@@ -691,22 +825,84 @@ namespace EnterpriseWorkReport.Views.Pages
         {
             if (!SessionManager.IsAdmin) return;
 
-            var confirm = MessageBox.Show(
-                "WARNING: This will delete ALL projects, users, work reports, and master data.\n\n" +
-                "The system will be reset to an empty state. Are you sure?",
-                "Clear All Data", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            var confirmWindow = new Window
+            {
+                Title = "⚠️ Clear All Data - Confirm",
+                Width = 480,
+                Height = 280,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                ResizeMode = ResizeMode.NoResize,
+                Background = (System.Windows.Media.Brush)Application.Current.Resources["AppBgBrush"]
+            };
 
-            if (confirm != MessageBoxResult.Yes) return;
+            var panel = new StackPanel { Margin = new Thickness(20) };
+            panel.Children.Add(new TextBlock
+            {
+                Text = "⚠️  DANGER: Reset Application Data",
+                FontWeight = FontWeights.Bold,
+                FontSize = 16,
+                Margin = new Thickness(0, 0, 0, 10),
+                Foreground = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"]
+            });
+            panel.Children.Add(new TextBlock
+            {
+                Text = "This will delete:\n• All projects\n• All work reports\n• All master data\n• All attendance & leave records\n• All messages & audit logs\n• All quality reports\n• All uploaded files\n\nBy default, USER ACCOUNTS will be preserved (recommended).",
+                TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 12)
+            });
+
+            var preserveUsersCheck = new System.Windows.Controls.CheckBox
+            {
+                Content = "Preserve User Accounts (recommended)",
+                IsChecked = true,
+                Margin = new Thickness(0, 0, 0, 16)
+            };
+            panel.Children.Add(preserveUsersCheck);
+
+            var warningText = new TextBlock
+            {
+                Text = "This action CANNOT be undone. Are you absolutely sure?",
+                FontWeight = FontWeights.SemiBold,
+                Foreground = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"],
+                Margin = new Thickness(0, 0, 0, 16)
+            };
+            panel.Children.Add(warningText);
+
+            var buttonPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+            var cancelBtn = new Button { Content = "Cancel", Width = 100, Margin = new Thickness(0, 0, 10, 0) };
+            var confirmBtn = new Button { Content = "YES, Reset Everything", Width = 150, Background = (System.Windows.Media.Brush)Application.Current.Resources["DangerBrush"], Foreground = System.Windows.Media.Brushes.White };
+            cancelBtn.Click += (s, e) => confirmWindow.DialogResult = false;
+            confirmBtn.Click += (s, e) => confirmWindow.DialogResult = true;
+            buttonPanel.Children.Add(cancelBtn);
+            buttonPanel.Children.Add(confirmBtn);
+            panel.Children.Add(buttonPanel);
+
+            confirmWindow.Content = panel;
+
+            if (confirmWindow.ShowDialog() == true)
+            {
+                bool preserveUsers = preserveUsersCheck.IsChecked == true;
+                PerformClearData(preserveUsers);
+            }
+        }
+
+        private void PerformClearData(bool preserveUsers = false)
+        {
+            if (!SessionManager.IsAdmin) return;
 
             try
             {
                 ClearDataBtn.IsEnabled = false;
                 ClearDataBtn.Content = "⏳ Clearing...";
 
-                DatabaseService.ClearAllData();
+                DatabaseService.ClearAllData(preserveUsers);
 
-                MessageBox.Show("All data has been cleared. The system is now empty.",
-                    "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                string msg = preserveUsers
+                    ? "All non-user data has been cleared. User accounts preserved."
+                    : "All data has been cleared including user accounts. System reset to factory defaults.";
+
+                MessageBox.Show(msg, "Data Cleared", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

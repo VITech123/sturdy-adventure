@@ -16,7 +16,8 @@ namespace EnterpriseWorkReport.Models
         public int CharacterCount { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public string Status { get; set; } // Shipped, Unassigned, Hold, Error
+        public DateTime? ReceivedDate { get; set; } // Date from Date column (manifest download date)
+        public string Status { get; set; } // Shipped, Unassigned, Hold, Error, Finished
         public string Batch { get; set; }
         public double QualityScore { get; set; }
         public int? AssignedUserId { get; set; }
