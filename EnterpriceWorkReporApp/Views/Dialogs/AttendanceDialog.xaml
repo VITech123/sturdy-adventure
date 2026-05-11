@@ -1,0 +1,39 @@
+<Window x:Class="EnterpriseWorkReport.Views.Dialogs.AttendanceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Mark Attendance" Width="450" Height="420"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
+        Background="{DynamicResource AppBgBrush}" ShowInTaskbar="False">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Padding="32">
+            <StackPanel>
+                <TextBlock Text="Mark Attendance" Style="{DynamicResource PageTitle}" Margin="0,0,0,24"/>
+
+                <TextBlock Text="EMPLOYEE *" Style="{DynamicResource FieldLabel}"/>
+                <ComboBox x:Name="EmployeeCombo" Style="{DynamicResource ModernComboBox}" Margin="0,0,0,16"/>
+
+                <TextBlock Text="DATE *" Style="{DynamicResource FieldLabel}"/>
+                <DatePicker x:Name="AttendanceDate" Margin="0,0,0,16"/>
+
+                <TextBlock Text="STATUS *" Style="{DynamicResource FieldLabel}"/>
+                <ComboBox x:Name="StatusCombo" Style="{DynamicResource ModernComboBox}" Margin="0,0,0,16">
+                    <ComboBoxItem Content="Present" IsSelected="True"/>
+                    <ComboBoxItem Content="Absent"/>
+                    <ComboBoxItem Content="Half Day"/>
+                    <ComboBoxItem Content="Leave"/>
+                </ComboBox>
+
+                <TextBlock Text="REMARKS" Style="{DynamicResource FieldLabel}"/>
+                <TextBox x:Name="RemarksBox" Style="{DynamicResource ModernTextBox}" Margin="0,0,0,20"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancel" Style="{DynamicResource OutlineButton}"
+                            Padding="16,10" Margin="0,0,10,0" Click="Cancel_Click"/>
+                    <Button Content="Save" Style="{DynamicResource PrimaryButton}"
+                            Padding="16,10" Click="Save_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</Window>
+

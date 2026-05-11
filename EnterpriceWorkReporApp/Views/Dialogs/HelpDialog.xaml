@@ -1,0 +1,106 @@
+<Window x:Class="EnterpriseWorkReport.Views.Dialogs.HelpDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Help - User Guide"
+        Width="750" Height="650"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip"
+        Background="{DynamicResource AppBgBrush}"
+        MinWidth="600" MinHeight="500">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock Text="📖 Enterprise Work Report (Pro Edition)" 
+                       FontSize="24" FontWeight="Bold" 
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock Text="Comprehensive guide to professional workforce management"
+                       FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0"/>
+        </StackPanel>
+        
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,12,0">
+            <StackPanel>
+                <!-- Pro Features Section -->
+                <Border Background="{DynamicResource PrimaryBrush}" CornerRadius="8" Margin="0,0,0,20" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="💎 Pro Features" FontSize="18" FontWeight="Bold" 
+                                   Foreground="White" Margin="0,0,0,12"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="White" FontSize="13" Opacity="0.9">
+                            <Run FontWeight="SemiBold">• Dynamic Themes:</Run><Run> Access Light, Navy, and AMOLED modes in Settings.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• Advanced Analytics:</Run><Run> View weekly billing trends and project distributions on the Dashboard.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• Professional PDF Export:</Run><Run> Generate Summary or Detailed PDF reports for clients.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• Attachments:</Run><Run> Securely attach PDFs or images to any work report.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• Demo Mode:</Run><Run> Toggle sample data for presentations in Settings.</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Core Modules -->
+                <UniformGrid Columns="2" Margin="0,0,0,16">
+                    <Border Style="{DynamicResource CardBorder}" Margin="0,0,8,16" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="📝 Work Reports" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12">
+                                <Run>Submit daily logs, track billing automatically, and manage file attachments.</Run>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{DynamicResource CardBorder}" Margin="8,0,0,16" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="📅 Attendance" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12">
+                                <Run>Clock in/out or record manual entries. Manage leave requests and approvals.</Run>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{DynamicResource CardBorder}" Margin="0,0,8,0" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="📊 Analytics" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12">
+                                <Run>Track productivity via Leaderboards and monitor quality performance metrics.</Run>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{DynamicResource CardBorder}" Margin="8,0,0,0" Padding="16">
+                        <StackPanel>
+                            <TextBlock Text="⚙ Admin Control" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,8"/>
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12">
+                                <Run>Configure projects, manage users, and perform bulk data operations.</Run>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+                
+                <!-- Database & Setup -->
+                <Border Style="{DynamicResource CardBorder}" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="💾 Data Storage Options" FontSize="15" FontWeight="Bold" 
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,12"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13">
+                            <Run FontWeight="SemiBold">• Local:</Run><Run> Files stored in app_data folder.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• Cloud Sync:</Run><Run> Move app_data to Dropbox/OneDrive for multi-PC sync.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• LAN Server:</Run><Run> Enable LAN Server in Settings for office-wide access.</Run><LineBreak/>
+                            <Run FontWeight="SemiBold">• External DB:</Run><Run> Enterprise scale via Azure/AWS (see README).</Run>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Footer -->
+        <Grid Grid.Row="2" Margin="0,20,0,0">
+            <TextBlock Text="Developer Portfolio: [Your Website]" VerticalAlignment="Center" 
+                       FontStyle="Italic" Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <Button Content="Close Guide" Style="{DynamicResource PrimaryButton}"
+                    HorizontalAlignment="Right" Padding="24,10"
+                    Click="CloseButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
+

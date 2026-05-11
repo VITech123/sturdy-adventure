@@ -1,0 +1,319 @@
+<Page x:Class="EnterpriseWorkReport.Views.Pages.DashboardPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      Background="{DynamicResource AppBgBrush}">
+    <Grid>
+        <!-- Dashboard Wallpaper -->
+        <Image x:Name="DashboardWallpaper" Stretch="UniformToFill" Opacity="0.15">
+            <Image.Effect>
+                <BlurEffect Radius="10"/>
+            </Image.Effect>
+        </Image>
+        
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Background="Transparent">
+        <StackPanel Margin="28">
+
+            <!-- Title -->
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Analytics Overview" Style="{DynamicResource PageTitle}"/>
+                    <TextBlock x:Name="SubtitleText" Style="{DynamicResource PageSubtitle}" Margin="0,4,0,0"/>
+                </StackPanel>
+                <Button x:Name="AdminPathBtn" Grid.Column="1" Content="Manage Project Paths" 
+                        Style="{DynamicResource OutlineButton}" Padding="16,8"
+                        Visibility="Collapsed" Click="AdminPathBtn_Click"/>
+            </Grid>
+
+            <!-- KPI Cards Row -->
+            <UniformGrid Columns="4" Margin="0,0,0,24">
+                <Border Style="{DynamicResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="" FontSize="28"/>
+                        <TextBlock x:Name="TotalObjectsText" Text="0" FontSize="32" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,8,0,4"/>
+                        <TextBlock Text="Today's Object IDs" Style="{DynamicResource FieldLabel}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{DynamicResource CardBorder}" Margin="6,0,6,0">
+                    <StackPanel>
+                        <TextBlock Text="" FontSize="28" Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock x:Name="TotalPagesText" Text="0" FontSize="32" FontWeight="Bold"
+                                   Foreground="{DynamicResource SuccessBrush}" Margin="0,8,0,4"/>
+                        <TextBlock Text="Today's Pages" Style="{DynamicResource FieldLabel}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{DynamicResource CardBorder}" Margin="6,0,6,0">
+                    <StackPanel>
+                        <TextBlock Text="" FontSize="28"/>
+                        <TextBlock x:Name="TotalCharsText" Text="0" FontSize="32" FontWeight="Bold"
+                                   Foreground="{DynamicResource AccentBrush}" Margin="0,8,0,4"/>
+                        <TextBlock Text="Today's Characters" Style="{DynamicResource FieldLabel}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{DynamicResource CardBorder}" Margin="12,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="" FontSize="28" Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock x:Name="TotalBillingText" Text="0.00" FontSize="32" FontWeight="Bold"
+                                   Foreground="{DynamicResource WarningBrush}" Margin="0,8,0,4"/>
+                        <TextBlock Text="Today's Billing Amount" Style="{DynamicResource FieldLabel}"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Quick Actions Row -->
+            <Grid Margin="0,0,0,24">
+                <Border Style="{DynamicResource CardBorder}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock Text="" FontSize="24" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Time Tracking" FontWeight="SemiBold" FontSize="15" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                <TextBlock x:Name="DashboardAttendanceStatus" Text="Status: Unknown" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button x:Name="ClockInBtn" Content="CLOCK IN" Style="{DynamicResource SuccessButton}" Width="140" Height="40" Margin="0,0,12,0" Click="ClockInBtn_Click"/>
+                            <Button x:Name="ClockOutBtn" Content="CLOCK OUT" Style="{DynamicResource DangerButton}" Width="140" Height="40" Click="ClockOutBtn_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Admin Daily Performance Grid -->
+            <Grid x:Name="AdminDailyPerformanceCard" Margin="0,0,0,24" Visibility="Collapsed">
+                <Border Style="{DynamicResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Today's Individual Performance" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <DataGrid x:Name="AdminDailyPerformanceGrid" Style="{DynamicResource ModernDataGrid}" MaxHeight="300">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="*"/>
+                                <DataGridTextColumn Header="Object IDs" Binding="{Binding ObjectsCount}" Width="100"/>
+                                <DataGridTextColumn Header="Pages" Binding="{Binding PagesCount}" Width="80"/>
+                                <DataGridTextColumn Header="Characters" Binding="{Binding CharsCount}" Width="100"/>
+                                <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat='{}{0:F2}'}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Section (Row 1: Billing and Project) -->
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Border Grid.Column="0" Style="{DynamicResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="Weekly Billing Trend" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <lvc:CartesianChart x:Name="BillingChart" Height="220" LegendLocation="None" Hoverable="True">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Title="Days" Labels="{Binding ChartLabels}"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Amount" LabelFormatter="{Binding ChartFormatter}"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </StackPanel>
+                </Border>
+                
+                <Border Grid.Column="1" Style="{DynamicResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Project Distribution" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <lvc:PieChart x:Name="ProjectPieChart" Height="220" LegendLocation="Bottom" Hoverable="True" InnerRadius="40"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Charts Section (Row 2: Attendance and Quality) -->
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{DynamicResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="Weekly Attendance (Days)" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <lvc:CartesianChart x:Name="AttendanceChart" Height="200" LegendLocation="None">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ChartLabels}"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Count" MinValue="0"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Style="{DynamicResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Quality Performance (Weekly)" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <lvc:CartesianChart x:Name="QualityTrendChart" Height="200" LegendLocation="None">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Labels="{Binding ChartLabels}"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="Score %" MaxValue="100" MinValue="0"/>
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+                        <!-- Resume Pipeline Section (Admin Only) -->
+            <Grid x:Name="ResumePipelineCard" Margin="0,0,0,24" Visibility="Collapsed">
+                <Border Style="{DynamicResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Resume Pipeline (Recruitment)" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <UniformGrid Columns="4">
+                            <StackPanel Margin="0,0,12,0" HorizontalAlignment="Center">
+                                <TextBlock x:Name="ResumesPendingText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#92400E" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Pending" Style="{DynamicResource FieldLabel}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Margin="6,0,6,0" HorizontalAlignment="Center">
+                                <TextBlock x:Name="ResumesOngoingText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#1E40AF" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Ongoing" Style="{DynamicResource FieldLabel}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Margin="6,0,6,0" HorizontalAlignment="Center">
+                                <TextBlock x:Name="ResumesRejectedText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#991B1B" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Rejected" Style="{DynamicResource FieldLabel}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Margin="12,0,0,0" HorizontalAlignment="Center">
+                                <TextBlock x:Name="ResumesRelievedText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#065F46" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Relieved" Style="{DynamicResource FieldLabel}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <!-- Mini Leaderboards Row -->
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Top Quality -->
+                <Border Grid.Column="0" Style="{DynamicResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="Top 3 Quality (This Month)" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <ItemsControl x:Name="TopQualityList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="0,8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Rank}" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" VerticalAlignment="Center" FontSize="13"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Score, StringFormat=N1}" FontWeight="SemiBold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Top Work Count -->
+                <Border Grid.Column="1" Style="{DynamicResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Top 3 Work Count (This Month)" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <ItemsControl x:Name="TopWorkCountList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="0,8" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="32"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Rank}" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding FullName}" VerticalAlignment="Center" FontSize="13"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding ReportCount}" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Bottom Row: Recent Reports + Recent Messages -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Recent Reports -->
+                <Border Grid.Column="0" Style="{DynamicResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="Recent Work Reports" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <DataGrid x:Name="RecentReportsGrid" Style="{DynamicResource ModernDataGrid}" MaxHeight="260">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
+                                <DataGridTextColumn Header="Project" Binding="{Binding ProjectName}" Width="*"/>
+                                <DataGridTextColumn Header="Object ID" Binding="{Binding ObjectId}" Width="*"/>
+                                <DataGridTextColumn Header="Billing" Binding="{Binding BillingAmount, StringFormat='{}{0:F2}'}" Width="100"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding SubmissionDate, StringFormat='dd/MM/yyyy'}" Width="100"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Recent Messages -->
+                <Border Grid.Column="1" Style="{DynamicResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="Recent Messages" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
+                        <ItemsControl x:Name="RecentMessagesList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="12" Margin="0,0,0,8" Background="{DynamicResource LightGrayBrush}" CornerRadius="6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                <TextBlock Text="{Binding SenderName}" FontWeight="SemiBold" FontSize="13"/>
+                                                <TextBlock Text="{Binding CreatedAt, StringFormat='{} â€¢ {0:MMM dd, HH:mm}'}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Subject}" FontWeight="Medium" FontSize="12" Margin="0,0,0,2"/>
+                                            <TextBlock Text="{Binding Content}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" MaxHeight="32"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+    </Grid>
+</Page>
+

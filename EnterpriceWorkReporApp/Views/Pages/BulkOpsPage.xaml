@@ -1,0 +1,99 @@
+<Page x:Class="EnterpriseWorkReport.Views.Pages.BulkOpsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource AppBgBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="28">
+            <TextBlock Text="Bulk Operations" Style="{DynamicResource PageTitle}"/>
+            <TextBlock Text="Upload data in bulk via CSV, Excel, TXT, JSON, or XML files. Download templates to get started."
+                       Style="{DynamicResource PageSubtitle}" Margin="0,4,0,24"/>
+
+            <UniformGrid Columns="2">
+                <!-- Bulk Work Reports -->
+                <Border Style="{DynamicResource CardBorder}" Margin="0,0,12,12">
+                    <StackPanel>
+                        <TextBlock Text="📝 Work Reports" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Import multiple work reports from Excel/CSV with fuzzy column matching."
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   TextWrapping="Wrap" Margin="0,0,0,16"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="📥 Smart Import" Style="{DynamicResource PrimaryButton}"
+                                    Padding="12,8" FontSize="13"
+                                    Click="SmartImportWorkReports_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Bulk Attendance -->
+                <Border Style="{DynamicResource CardBorder}" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="📅 Attendance" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Upload attendance records for multiple employees."
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   TextWrapping="Wrap" Margin="0,0,0,16"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="📥 Smart Import" Style="{DynamicResource PrimaryButton}"
+                                    Padding="12,8" FontSize="13" Margin="0,0,8,0"
+                                    Click="SmartImportAttendance_Click"/>
+                            <Button Content="⬇ Template" Style="{DynamicResource OutlineButton}"
+                                    Padding="12,8" FontSize="13"
+                                    Click="DownloadTemplate_Click" Tag="Attendance"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Bulk Quality -->
+                <Border Style="{DynamicResource CardBorder}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="⭐ Quality Reports" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Upload quality scores for multiple employees at once."
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   TextWrapping="Wrap" Margin="0,0,0,16"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="📥 Smart Import" Style="{DynamicResource PrimaryButton}"
+                                    Padding="12,8" FontSize="13" Margin="0,0,8,0"
+                                    Click="SmartImportQuality_Click"/>
+                            <Button Content="⬇ Template" Style="{DynamicResource OutlineButton}"
+                                    Padding="12,8" FontSize="13"
+                                    Click="DownloadTemplate_Click" Tag="Quality"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Master File Upload -->
+                <Border Style="{DynamicResource CardBorder}" Margin="0,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="📋 Master File" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Upload master files for projects (finished or current)."
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"
+                                   TextWrapping="Wrap" Margin="0,0,0,16"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="📥 Upload Master" Style="{DynamicResource PrimaryButton}"
+                                    Padding="12,8" FontSize="13" Margin="0,0,8,0"
+                                    Click="UploadMasterFile_Click"/>
+                            <ComboBox x:Name="ProjectSelector" Width="120" Style="{DynamicResource ModernComboBox}" 
+                                      DisplayMemberPath="Name" SelectedValuePath="Id"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Import Log -->
+            <Border Style="{DynamicResource CardBorder}" Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Text="Import Log" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+                    <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="ImportLogText" Text="No imports yet." FontSize="12" FontFamily="Consolas"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+                    </ScrollViewer>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

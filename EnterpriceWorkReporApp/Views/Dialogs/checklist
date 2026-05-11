@@ -1,0 +1,60 @@
+role-oriented desktop application designed for office environments where
+multiple Windows systems are connected via LAN. It allows admins and users to manage
+attendance, leave, projects, work reports, and billing efficiently. The system operates on a
+client-server model with the server hosting the central database and connected client
+systems.
+2. User Roles and Dashboards
+**Admin:** Full control over users, projects, reports, and billing. Can add/edit/delete data
+and view reports.
+**User:** Can log attendance, apply leave, submit work reports, and view their performance
+and earnings.
+3. Core Modules and Features
+3.1 Attendance Management
+- Admin can view, edit, and delete attendance records.
+- Users can clock in and clock out daily.
+- Attendance data should be downloadable (PDF/CSV).
+- Daily, weekly, and monthly summaries.
+3.2 Leave Management
+- Users can apply for leave.
+- Admin can approve or reject leave requests.
+- Leave data is stored for reporting.
+3.3 User Management
+- Admin can add, edit, or delete users.
+- Admin sets username and password for each user.
+- Users can update their profiles (profile picture, contact info).
+- Admin can reset passwords; users can change their own.
+
+3.4 Project Management
+- Admin can create, edit, delete, and hold projects (individually or in bulk).
+- Each project includes: Project Name, Object ID, Pages, Characters, Records, and Formula
+for billing.
+- Example Formulas:
+- Formula 1: (pages × 0.05) + ((characters / 1000) × 4.75)
+- Formula 2: (records × 0.25)
+- Admin can define billing formulas per project.
+3.5 Work Reports
+- Users can submit daily/weekly/monthly work reports.
+- Reports link to project fields (Object ID, pages, etc.).
+- Duplicate Object ID check before overwrite.
+- Billing formula triggers after submission.
+- System shows total objects and earnings per day.
+- Reports are filterable by date, user, and project.
+3.6 Billing Management
+- Calculates total earnings per project and user.
+- Displays detailed breakdown of earnings.
+- Admin can view all user billing reports.
+- Users can view their own earnings.
+4. Reports and Exports
+- All reports (attendance, leaves, work, billing) are downloadable.
+- Filterable by date, user, and project.
+- Admin dashboard includes daily, weekly, and monthly summaries.
+5. Authentication and Security
+- Role-based login system (Admin/User).
+- Password encryption and secure storage.
+- Password reset and change options.
+- Session-based authentication for LAN users.
+2. Database setup (local + LAN mode)
+
+3. Admin and User dashboards
+4. Report download system
+5. Installation guide and documentation

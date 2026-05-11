@@ -1,0 +1,76 @@
+<Page x:Class="EnterpriseWorkReport.Views.Pages.BillingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource AppBgBrush}">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Billing Management" Style="{DynamicResource PageTitle}"/>
+            <TextBlock Text="View billing reports by employee, project, or month. All values in Indian Rupees (₹)."
+                       Style="{DynamicResource PageSubtitle}"/>
+        </StackPanel>
+
+        <!-- KPI Row -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,16">
+            <Border Style="{DynamicResource CardBorder}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="Total Billing (All Time)" Style="{DynamicResource FieldLabel}"/>
+                    <TextBlock x:Name="TotalBillingText" Text="₹0.00" FontSize="26" FontWeight="Bold"
+                               Foreground="{DynamicResource SuccessBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{DynamicResource CardBorder}" Margin="4,0">
+                <StackPanel>
+                    <TextBlock Text="This Month" Style="{DynamicResource FieldLabel}"/>
+                    <TextBlock x:Name="MonthBillingText" Text="₹0.00" FontSize="26" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{DynamicResource CardBorder}" Margin="8,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="Today" Style="{DynamicResource FieldLabel}"/>
+                    <TextBlock x:Name="TodayBillingText" Text="₹0.00" FontSize="26" FontWeight="Bold"
+                               Foreground="{DynamicResource AccentBrush}"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Filters -->
+        <Border Grid.Row="2" Style="{DynamicResource CardBorder}" Padding="16" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal">
+                <ComboBox x:Name="FilterEmployee" Style="{DynamicResource ModernComboBox}"
+                          Width="200" Margin="0,0,10,0" SelectionChanged="Filter_Changed"/>
+                <ComboBox x:Name="FilterProject" Style="{DynamicResource ModernComboBox}"
+                          Width="200" Margin="0,0,10,0" SelectionChanged="Filter_Changed"/>
+                <DatePicker x:Name="FilterFrom" Width="150" Margin="0,0,10,0" SelectedDateChanged="Filter_Changed"/>
+                <DatePicker x:Name="FilterTo" Width="150" Margin="0,0,10,0" SelectedDateChanged="Filter_Changed"/>
+                <Button Content="Clear" Style="{DynamicResource OutlineButton}" Padding="12,9" FontSize="13"
+                        Margin="0,0,10,0" Click="ClearFilter_Click"/>
+                <Button Content="⬇ Export PDF" Style="{DynamicResource OutlineButton}" Padding="14,9" FontSize="13"
+                        Margin="0,0,10,0" Click="ExportPdf_Click"/>
+                <Button Content="⬇ Export CSV" Style="{DynamicResource SuccessButton}" Padding="14,9" FontSize="13"
+                        Click="Export_Click"/>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3" Style="{DynamicResource CardBorder}" Padding="0">
+            <DataGrid x:Name="BillingGrid" Style="{DynamicResource ModernDataGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
+                    <DataGridTextColumn Header="Project" Binding="{Binding ProjectName}" Width="*"/>
+                    <DataGridTextColumn Header="Object ID" Binding="{Binding ObjectId}" Width="*"/>
+                    <DataGridTextColumn Header="Billing Amount" Binding="{Binding BillingAmount, StringFormat='₹{0:F2}'}" Width="150"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding SubmissionDate, StringFormat='dd/MM/yyyy'}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </Border>
+    </Grid>
+</Page>
+

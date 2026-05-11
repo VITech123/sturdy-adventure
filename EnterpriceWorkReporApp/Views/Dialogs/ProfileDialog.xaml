@@ -1,0 +1,138 @@
+<Window x:Class="EnterpriseWorkReport.Views.Dialogs.ProfileDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="My Profile"
+        Height="520"
+        Width="450"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F5F5F5">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#333"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+            <Setter Property="BorderBrush" Value="#CCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="PasswordBox">
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,5,0,15"/>
+            <Setter Property="BorderBrush" Value="#CCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="My Profile" FontSize="24" FontWeight="Bold" Foreground="#1E88E5"/>
+            <TextBlock Text="Update your personal information and password" FontSize="12" Foreground="#666"/>
+        </StackPanel>
+        
+        <!-- Profile Form -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Personal Information -->
+                <TextBlock Text="PERSONAL INFORMATION" FontSize="11" FontWeight="Bold" Foreground="#1E88E5" Margin="0,0,0,10"/>
+                
+                <Grid Margin="0,0,0,15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Border Grid.Column="0" Background="#DDD" CornerRadius="36" Width="72" Height="72" Margin="0,0,15,0" ClipToBounds="True">
+                        <Grid>
+                            <TextBlock x:Name="ProfileInitials" FontSize="28" Foreground="#555" FontWeight="Bold" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Image x:Name="ProfileImagePreview" Stretch="UniformToFill" Visibility="Collapsed"/>
+                        </Grid>
+                    </Border>
+                    
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <Button Content="Upload Picture" Width="110" Height="28" HorizontalAlignment="Left"
+                                Background="White" BorderBrush="#CCC" Click="UploadPicture_Click"/>
+                        <Button Content="Select from Gallery" Width="110" Height="28" HorizontalAlignment="Left" Margin="0,5,0,0"
+                                Background="White" BorderBrush="#CCC" Click="SelectFromGallery_Click"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="Full Name"/>
+                <TextBox x:Name="FullNameBox"/>
+                
+                <TextBlock Text="Email"/>
+                <TextBox x:Name="EmailBox"/>
+                
+                <TextBlock Text="Phone"/>
+                <TextBox x:Name="PhoneBox"/>
+                
+                <TextBlock Text="Place"/>
+                <TextBox x:Name="PlaceBox"/>
+
+                <TextBlock Text="Education"/>
+                <TextBox x:Name="EducationBox"/>
+
+                <TextBlock Text="Emergency Number"/>
+                <TextBox x:Name="EmergencyBox"/>
+                
+                <TextBlock Text="Department"/>
+                <TextBox x:Name="DepartmentBox"/>
+                
+                <TextBlock Text="Designation"/>
+                <TextBox x:Name="DesignationBox"/>
+                
+                <!-- Customization Section -->
+                <TextBlock Text="CUSTOMIZATION" FontSize="11" FontWeight="Bold" Foreground="#1E88E5" Margin="0,20,0,10"/>
+                
+                <TextBlock Text="Dashboard Theme"/>
+                <ComboBox x:Name="ThemeCombo" Margin="0,5,0,15" Padding="10">
+                    <ComboBoxItem Content="Default Blue" IsSelected="True"/>
+                    <ComboBoxItem Content="Emerald Green"/>
+                    <ComboBoxItem Content="Deep Purple"/>
+                    <ComboBoxItem Content="Sunset Orange"/>
+                </ComboBox>
+
+                <TextBlock Text="Dashboard Wallpaper"/>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,15">
+                    <Button Content="Choose Wallpaper" Click="ChooseWallpaper_Click" Width="130" Height="30" Background="White" BorderBrush="#CCC" Cursor="Hand"/>
+                    <Button Content="Clear" Click="ClearWallpaper_Click" Width="60" Height="30" Margin="10,0,0,0" Background="White" BorderBrush="#CCC" Cursor="Hand"/>
+                </StackPanel>
+                <TextBlock x:Name="WallpaperStatus" FontSize="11" Foreground="#666" Margin="0,-10,0,10"/>
+                
+                <!-- Change Password Section -->
+                <TextBlock Text="CHANGE PASSWORD" FontSize="11" FontWeight="Bold" Foreground="#1E88E5" Margin="0,20,0,10"/>
+                
+                <TextBlock Text="Current Password"/>
+                <PasswordBox x:Name="CurrentPasswordBox"/>
+                
+                <TextBlock Text="New Password"/>
+                <PasswordBox x:Name="NewPasswordBox"/>
+                
+                <TextBlock Text="Confirm New Password"/>
+                <PasswordBox x:Name="ConfirmPasswordBox"/>
+                
+                <TextBlock x:Name="ErrorText" Foreground="#E53935" FontSize="12" Margin="0,10,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Cancel" Click="Cancel_Click" Width="100" Height="35" Margin="0,0,10,0" 
+                    Background="#EEE" BorderBrush="#CCC" Cursor="Hand"/>
+            <Button Content="Save Changes" Click="Save_Click" Width="120" Height="35"
+                    Background="#1E88E5" Foreground="White" BorderBrush="#1E88E5" Cursor="Hand"/>
+        </StackPanel>
+    </Grid>
+</Window>

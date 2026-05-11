@@ -1,0 +1,79 @@
+<Window x:Class="EnterpriseWorkReport.Views.Dialogs.ImportQualityReportsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Import Quality Reports"
+        Height="700"
+        Width="1000"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource AppBgBrush}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="Import Quality Reports" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+            <TextBlock Text="Import summary and detailed quality reports with automatic matching" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{DynamicResource CardBorder}" Padding="16" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Select Quality Report Files (Summary or Detailed)" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBox x:Name="FilePathBox" Style="{DynamicResource ModernTextBox}" IsReadOnly="True"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="Browse Files" Style="{DynamicResource PrimaryButton}" Margin="12,0,0,0" VerticalAlignment="Bottom" Click="Browse_Click"/>
+            </Grid>
+        </Border>
+
+        <TabControl Grid.Row="2" Style="{DynamicResource ModernTabControl}" Background="Transparent" BorderThickness="0">
+            <TabItem Header="Data Preview">
+                <Border Style="{DynamicResource CardBorder}" Margin="0,8,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                            <RadioButton x:Name="TypeSummaryRadio" Content="Summary Report" IsChecked="True" VerticalAlignment="Center" Margin="0,0,16,0" Checked="Type_Changed"/>
+                            <RadioButton x:Name="TypeDetailedRadio" Content="Detailed Report" VerticalAlignment="Center" Checked="Type_Changed"/>
+                            <Separator Margin="16,0"/>
+                            <TextBlock Text="Date Override:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <DatePicker x:Name="OverrideDatePicker" Width="120" Style="{DynamicResource ModernDatePicker}"/>
+                        </StackPanel>
+                        <DataGrid x:Name="PreviewGrid" Grid.Row="1" AutoGenerateColumns="True" IsReadOnly="True" GridLinesVisibility="All"/>
+                    </Grid>
+                </Border>
+            </TabItem>
+            <TabItem Header="Column Mapping">
+                <Border Style="{DynamicResource CardBorder}" Margin="0,8,0,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="MappingPanel"/>
+                    </ScrollViewer>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <Border Grid.Row="3" Style="{DynamicResource CardBorder}" Padding="16" Margin="0,16,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Project:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox x:Name="ProjectCombo" Width="200" Style="{DynamicResource ModernComboBox}"/>
+                </StackPanel>
+                <Button Grid.Column="1" x:Name="ImportBtn" Content="Import Quality Data" Style="{DynamicResource PrimaryButton}" Padding="20,10" Click="Import_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
+

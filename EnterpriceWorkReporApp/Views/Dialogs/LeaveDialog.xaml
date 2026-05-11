@@ -1,0 +1,53 @@
+<Window x:Class="EnterpriseWorkReport.Views.Dialogs.LeaveDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Apply for Leave" Width="480" Height="480"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
+        Background="{DynamicResource AppBgBrush}" ShowInTaskbar="False">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Padding="32">
+            <StackPanel>
+                <TextBlock Text="Apply for Leave" Style="{DynamicResource PageTitle}" Margin="0,0,0,24"/>
+
+                <TextBlock Text="EMPLOYEE *" Style="{DynamicResource FieldLabel}"/>
+                <ComboBox x:Name="EmployeeCombo" Style="{DynamicResource ModernComboBox}" Margin="0,0,0,14"/>
+
+                <TextBlock Text="LEAVE TYPE *" Style="{DynamicResource FieldLabel}"/>
+                <ComboBox x:Name="LeaveTypeCombo" Style="{DynamicResource ModernComboBox}" Margin="0,0,0,14">
+                    <ComboBoxItem Content="Casual Leave" IsSelected="True"/>
+                    <ComboBoxItem Content="Sick Leave"/>
+                    <ComboBoxItem Content="Paid Leave"/>
+                    <ComboBoxItem Content="Unpaid Leave"/>
+                </ComboBox>
+
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="START DATE *" Style="{DynamicResource FieldLabel}"/>
+                        <DatePicker x:Name="StartDate"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="END DATE *" Style="{DynamicResource FieldLabel}"/>
+                        <DatePicker x:Name="EndDate"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="REASON" Style="{DynamicResource FieldLabel}"/>
+                <TextBox x:Name="ReasonBox" Style="{DynamicResource ModernTextBox}" Height="65"
+                         TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,20"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancel" Style="{DynamicResource OutlineButton}"
+                            Padding="16,10" Margin="0,0,10,0" Click="Cancel_Click"/>
+                    <Button Content="Submit Request" Style="{DynamicResource PrimaryButton}"
+                            Padding="16,10" Click="Save_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</Window>
+

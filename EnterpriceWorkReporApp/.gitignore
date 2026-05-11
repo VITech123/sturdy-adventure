@@ -1,0 +1,37 @@
+## [Visual Studio]
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+## [Build folders]
+bin/
+obj/
+publish/
+*.zip
+
+## [Runtime Data]
+app_data/
+*.db
+*.log
+
+## [User-specific files]
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## [Package Manager]
+packages/
+node_modules/
+
+## [OS specific]
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+## [Other]
+*.csv
+*.xlsx
+!samples/*.csv
+!samples/*.xlsx
