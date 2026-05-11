@@ -1,0 +1,206 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h2 font-weight-bold" style="color: #003087;">Analytics Overview</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group mr-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <i class="fa fa-calendar"></i> This Week
+        </button>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100 border-left-primary py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Today's Completion</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="todayObjects">1,240</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="kpi-icon-bg bg-light text-primary">
+                            <i class="fa fa-pencil-square-o"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100 border-left-success py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Avg Quality Score</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="avgQuality">98.2%</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="kpi-icon-bg bg-light text-success">
+                            <i class="fa fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100 border-left-info py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Pending Leaves</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="pendingLeaves">4</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="kpi-icon-bg bg-light text-info">
+                            <i class="fa fa-calendar-times-o"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card h-100 border-left-warning py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Billing</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalBilling">₹42,500</div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="kpi-icon-bg bg-light text-warning">
+                            <i class="fa fa-money"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Area Chart -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Monthly Productivity Trend</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area" style="height: 300px;">
+                    <canvas id="myAreaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Messages</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary">Leave Approved</h6>
+                            <small class="text-muted">3m ago</small>
+                        </div>
+                        <p class="mb-1 small text-dark">Your leave request for next Friday has been approved by Admin.</p>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary">System Notice</h6>
+                            <small class="text-muted">1h ago</small>
+                        </div>
+                        <p class="mb-1 small text-dark">Monthly billing cycle starts tomorrow. Please sync markers.</p>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary">Quality Alert</h6>
+                            <small class="text-muted">5h ago</small>
+                        </div>
+                        <p class="mb-1 small text-dark">Project AX-01 shows a slight drop in accuracy. Review guidelines.</p>
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-center bg-white border-top-0">
+                <a href="#" class="small font-weight-bold">View All Messages</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Reports Table -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Recent Work Reports</h6>
+        <button class="btn btn-sm btn-primary">Refresh <i class="fa fa-refresh ml-1"></i></button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Object ID</th>
+                        <th>Project</th>
+                        <th>Employee</th>
+                        <th>Status</th>
+                        <th>Billing</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-weight-bold">#28491-X</td>
+                        <td>Data Tagging v2</td>
+                        <td>Rahul Sharma</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>₹142.50</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-info"><i class="fa fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">#28492-X</td>
+                        <td>Image Annotation</td>
+                        <td>Priya Patel</td>
+                        <td><span class="badge badge-success">Completed</span></td>
+                        <td>₹85.00</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-info"><i class="fa fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-weight-bold">#28493-X</td>
+                        <td>Data Tagging v2</td>
+                        <td>Amit Kumar</td>
+                        <td><span class="badge badge-warning">Pending</span></td>
+                        <td>₹0.00</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-info"><i class="fa fa-eye"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js 2.9.4 for IE11 Compatibility -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="~/js/dashboard.js"></script>
+}

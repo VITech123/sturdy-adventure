@@ -1,0 +1,318 @@
+/* ============================================================
+   ProductivitySystem - Premium Enterprise Stylesheet
+   IE11 + Windows 7 Safe | Bootstrap 4.6 Extension
+   ============================================================ */
+
+/* ---- Global ---- */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: #333;
+    background-color: #F4F6F9;
+    line-height: 1.6;
+}
+
+a {
+    color: #003087;
+}
+
+a:hover {
+    color: #001a4d;
+    text-decoration: none;
+}
+
+/* ---- Typography Helpers ---- */
+.text-xs {
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.text-gray-800 {
+    color: #2d3748 !important;
+}
+
+.text-gray-600 {
+    color: #718096 !important;
+}
+
+/* ---- Top Navbar ---- */
+.navbar-top {
+    background-color: #003087;
+    height: 60px;
+    z-index: 1030;
+    -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-top .navbar-brand {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.navbar-top .form-control:focus {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border-color: #80bdff;
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #fff;
+    border-right: 1px solid #e9ecef;
+    -webkit-box-shadow: 2px 0 5px rgba(0,0,0,0.03);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.03);
+    width: 220px;
+}
+
+.sidebar .nav-link {
+    padding: 0.75rem 1.25rem;
+    font-weight: 500;
+    color: #555;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #003087;
+    border-left-color: #003087;
+}
+
+.sidebar .nav-link.active {
+    background-color: #eef2ff;
+    color: #003087;
+    font-weight: 600;
+    border-left-color: #003087;
+}
+
+.sidebar .nav-link i {
+    width: 20px;
+    text-align: center;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.sidebar-section-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #adb5bd;
+    padding: 1rem 1.25rem 0.4rem;
+    font-weight: 700;
+}
+
+/* ---- Main Content ---- */
+.main-content {
+    margin-left: 220px;
+    margin-top: 60px;
+    padding: 24px 28px;
+    min-height: calc(100vh - 60px);
+}
+
+/* ---- Cards ---- */
+.card {
+    border: none;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    background-color: #fff;
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.85rem 1.25rem;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* ---- KPI Cards ---- */
+.border-left-primary {
+    border-left: 4px solid #003087 !important;
+}
+
+.border-left-success {
+    border-left: 4px solid #28a745 !important;
+}
+
+.border-left-info {
+    border-left: 4px solid #17a2b8 !important;
+}
+
+.border-left-warning {
+    border-left: 4px solid #ffc107 !important;
+}
+
+.border-left-danger {
+    border-left: 4px solid #dc3545 !important;
+}
+
+.kpi-icon-bg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+/* ---- Premium Tables ---- */
+.table th {
+    background-color: #f8f9fa;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    border-top: none;
+    padding: 0.85rem 1rem;
+    font-weight: 700;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 13px;
+    padding: 0.75rem 1rem;
+    color: #495057;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f0f4ff;
+}
+
+/* ---- Badges ---- */
+.badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0.35em 0.65em;
+    border-radius: 3px;
+}
+
+/* ---- Buttons ---- */
+.btn {
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 13px;
+    padding: 0.5rem 1rem;
+    -webkit-transition: all 0.15s ease;
+    transition: all 0.15s ease;
+}
+
+.btn-primary {
+    background-color: #003087;
+    border-color: #003087;
+}
+
+.btn-primary:hover {
+    background-color: #00205c;
+    border-color: #00205c;
+}
+
+.btn-success {
+    background-color: #218838;
+    border-color: #218838;
+}
+
+.btn-danger {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.btn-lg,
+.btn-submit {
+    min-height: 48px;
+    font-size: 15px;
+    padding: 0.65rem 1.5rem;
+}
+
+/* ---- Form Controls ---- */
+.form-control {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    font-size: 14px;
+    padding: 0.5rem 0.75rem;
+    min-height: 42px;
+    -webkit-transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease;
+}
+
+.form-control:focus {
+    border-color: #003087;
+    -webkit-box-shadow: 0 0 0 0.15rem rgba(0,48,135,0.15);
+    box-shadow: 0 0 0 0.15rem rgba(0,48,135,0.15);
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #495057;
+    margin-bottom: 0.35rem;
+}
+
+/* ---- List Group Premium ---- */
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item {
+    border-left: none;
+    border-right: none;
+    padding: 0.85rem 1.25rem;
+}
+
+/* ---- Charts ---- */
+.chart-area {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* ---- Utility: Shadow Variants ---- */
+.shadow-sm {
+    -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+
+/* ---- Responsive: below 768px collapse sidebar ---- */
+@media (max-width: 767.98px) {
+    .sidebar {
+        display: none;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* ---- IE11 Specific Fixes ---- */
+/* IE11 flexbox bug fix */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .d-flex {
+        display: -ms-flexbox !important;
+    }
+    .card {
+        display: block;
+    }
+    .kpi-icon-bg {
+        display: block;
+        text-align: center;
+        line-height: 48px;
+    }
+}

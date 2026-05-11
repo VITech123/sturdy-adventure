@@ -1,0 +1,9 @@
+admin:
+1. can add users details, username, password, startdate.
+2. can view & edit attendance details of the users.
+3. Can View & Edit work reports of user.
+4. can view Qulaity reports details. for all users. individual, project wise, date wise and also can get average quality of the individual users for every project.
+5. internal message system. and can attach file, download files.
+6. can see the statics of the all projects.(indivulay, datawise, project wise). how many manifest id we have for for current date, how many objects are in each manifest, how many pages, and how many characters for each project.
+7. Manage resumes: upload images of resumes, organize them by status (Ongoing, Pending, Rejected, Relieved), view resume images alongside candidate details, and automatically extract text/details (OCR) from uploaded images.
+ centralized database.

@@ -1,0 +1,231 @@
+@{
+    ViewData["Title"] = "Submit Work Report";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h2 font-weight-bold" style="color: #003087;">Submit Work Report</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent p-0 mb-0" style="font-size: 13px;">
+            <li class="breadcrumb-item"><a href="/Dashboard">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="/WorkReports">Work Reports</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Submit</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Form Card -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex align-items-center">
+                <i class="fa fa-pencil-square-o text-primary mr-2"></i>
+                <h6 class="m-0 font-weight-bold text-primary">New Entry</h6>
+            </div>
+            <div class="card-body">
+                <form id="workReportForm">
+                    <!-- Project Selection -->
+                    <div class="form-group">
+                        <label for="projectSelect">
+                            <i class="fa fa-folder-open-o mr-1 text-muted"></i> Project
+                            <span class="text-danger">*</span>
+                        </label>
+                        <select id="projectSelect" class="form-control" required>
+                            <option value="">-- Select a Project --</option>
+                            <option value="1">Data Tagging v2</option>
+                            <option value="2">Image Annotation</option>
+                            <option value="3">Document Classification</option>
+                        </select>
+                    </div>
+
+                    <!-- Object ID -->
+                    <div class="form-group">
+                        <label for="objectIdInput">
+                            <i class="fa fa-barcode mr-1 text-muted"></i> Object ID
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="objectIdInput" class="form-control"
+                               placeholder="Enter unique Object ID (e.g., DOC-2024-00123)" required />
+                        <small class="form-text text-muted">Must be unique. Duplicates will prompt for replacement.</small>
+                    </div>
+
+                    <!-- Dynamic Fields Container -->
+                    <div id="dynamicFieldsContainer">
+                        <hr />
+                        <p class="text-muted small mb-3">
+                            <i class="fa fa-info-circle mr-1"></i>
+                            Project-specific fields will appear below after selecting a project.
+                        </p>
+
+                        <!-- Sample dynamic fields (JS will render these) -->
+                        <div class="form-group">
+                            <label for="field_charCount">
+                                Character Count <span class="text-danger">*</span>
+                                <span class="badge badge-info ml-1" style="font-size:10px;">Billing</span>
+                            </label>
+                            <input type="number" id="field_charCount" class="form-control"
+                                   placeholder="0" min="0" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_recordCount">
+                                Record Count <span class="text-danger">*</span>
+                                <span class="badge badge-info ml-1" style="font-size:10px;">Billing</span>
+                            </label>
+                            <input type="number" id="field_recordCount" class="form-control"
+                                   placeholder="0" min="0" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="field_remarks">Remarks</label>
+                            <textarea id="field_remarks" class="form-control" rows="2"
+                                      placeholder="Optional notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Attachment -->
+                    <div class="form-group">
+                        <label for="attachmentInput">
+                            <i class="fa fa-paperclip mr-1 text-muted"></i> Attachment (Optional)
+                        </label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="attachmentInput" />
+                            <label class="custom-file-label" for="attachmentInput">Choose file...</label>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.history.back();">
+                            <i class="fa fa-arrow-left mr-1"></i> Cancel
+                        </button>
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-submit mr-2">
+                                <i class="fa fa-check mr-1"></i> Submit Report
+                            </button>
+                            <button type="button" class="btn btn-success btn-submit" id="submitAndNextBtn">
+                                <i class="fa fa-forward mr-1"></i> Submit &amp; Next
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Side Panel: Billing Preview & Help -->
+    <div class="col-lg-4">
+        <!-- Billing Preview -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <i class="fa fa-calculator text-success mr-2"></i>
+                <span class="font-weight-bold text-success">Billing Preview</span>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted small mb-2">Estimated billing for this entry:</p>
+                <h2 class="font-weight-bold text-success mb-0" id="billingPreview">₹0.00</h2>
+                <p class="text-muted small mt-2 mb-0">
+                    Formula: <code>(CharacterCount / 1000) * 4.85</code>
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Guide -->
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <i class="fa fa-question-circle text-info mr-2"></i>
+                <span class="font-weight-bold text-info">How To Submit</span>
+            </div>
+            <div class="card-body p-0">
+                <ol class="list-group list-group-flush small">
+                    <li class="list-group-item">
+                        <strong>1.</strong> Select the project you worked on.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>2.</strong> Enter the unique Object ID from the task.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>3.</strong> Fill in the character/record counts accurately.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>4.</strong> Click <strong>Submit</strong> or <strong>Submit &amp; Next</strong> for continuous entry.
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+    // ES5 Only - IE11 Safe
+    (function () {
+        'use strict';
+
+        // File input label update
+        $(document).on('change', '.custom-file-input', function () {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).siblings('.custom-file-label').addClass('selected').html(fileName || 'Choose file...');
+        });
+
+        // Live billing preview
+        $('#field_charCount').on('input', function () {
+            try {
+                var count = parseFloat($(this).val()) || 0;
+                var rate = 4.85;
+                var billing = (count / 1000) * rate;
+                $('#billingPreview').text('\u20B9' + billing.toFixed(2));
+            } catch (e) {
+                $('#billingPreview').text('\u20B90.00');
+            }
+        });
+
+        // Form submission
+        $('#workReportForm').on('submit', function (e) {
+            e.preventDefault();
+            submitReport(false);
+        });
+
+        $('#submitAndNextBtn').on('click', function () {
+            if ($('#workReportForm')[0].checkValidity()) {
+                submitReport(true);
+            } else {
+                $('#workReportForm')[0].reportValidity();
+            }
+        });
+
+        function submitReport(continueEntry) {
+            // Gather form data
+            var formData = {
+                projectId: $('#projectSelect').val(),
+                objectId: $('#objectIdInput').val(),
+                charCount: $('#field_charCount').val(),
+                recordCount: $('#field_recordCount').val(),
+                remarks: $('#field_remarks').val()
+            };
+
+            if (!formData.projectId || !formData.objectId) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Simulate submission (replace with AJAX call)
+            alert('Report submitted successfully!\nObject ID: ' + formData.objectId +
+                  '\nBilling: ' + $('#billingPreview').text());
+
+            if (continueEntry) {
+                // Reset for next entry but keep project selected
+                $('#objectIdInput').val('');
+                $('#field_charCount').val('');
+                $('#field_recordCount').val('');
+                $('#field_remarks').val('');
+                $('#billingPreview').text('\u20B90.00');
+                $('#objectIdInput').focus();
+            } else {
+                window.location.href = '/WorkReports';
+            }
+        }
+    })();
+    </script>
+}

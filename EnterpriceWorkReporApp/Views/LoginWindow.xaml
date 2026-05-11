@@ -1,0 +1,128 @@
+<Window x:Class="EnterpriseWorkReport.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Enterprise Work Report – Login"
+        Width="900" Height="560"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
+
+    <Border CornerRadius="16" ClipToBounds="True">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="420"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Panel: Branding -->
+            <Border Grid.Column="0" CornerRadius="16,0,0,16">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#3B82F6" Offset="0"/>
+                        <GradientStop Color="#8B5CF6" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="50">
+                    <!-- Logo Icon -->
+                    <Border Background="#40FFFFFF" CornerRadius="16" Width="72" Height="72" Margin="0,0,0,28">
+                        <TextBlock Text="📊" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Enterprise Work Report" FontSize="26" FontWeight="Bold"
+                               Foreground="White" TextAlignment="Center"/>
+                    <TextBlock Text="A complete workforce management platform for data services companies."
+                               FontSize="13" Foreground="#B0CCFF" TextAlignment="Center"
+                               TextWrapping="Wrap" Margin="0,12,0,40"/>
+
+                    <!-- Feature Bullets -->
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="✔  Productivity &amp; Work Reports" Foreground="#D0E4FF" FontSize="12" Margin="0,4"/>
+                        <TextBlock Text="✔  Automated Billing (₹)" Foreground="#D0E4FF" FontSize="12" Margin="0,4"/>
+                        <TextBlock Text="✔  Attendance &amp; Leave Management" Foreground="#D0E4FF" FontSize="12" Margin="0,4"/>
+                        <TextBlock Text="✔  Quality Reports &amp; Leaderboards" Foreground="#D0E4FF" FontSize="12" Margin="0,4"/>
+                        <TextBlock Text="✔  Analytics Dashboards" Foreground="#D0E4FF" FontSize="12" Margin="0,4"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Right Panel: Login Form -->
+            <Border Grid.Column="1" Background="White" CornerRadius="0,16,16,0">
+                <StackPanel VerticalAlignment="Center" Margin="48">
+
+                    <!-- Drag Handle -->
+                    <Border Background="Transparent" Margin="0,-40,0,32"
+                            MouseLeftButtonDown="DragWindow">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="Welcome back 👋" FontSize="24" FontWeight="Bold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Sign in to your account" FontSize="13"
+                                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0"/>
+                                </StackPanel>
+                                <Button x:Name="HelpBtn" Content="❓ Help" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                        Background="Transparent" Foreground="{DynamicResource PrimaryBrush}"
+                                        BorderThickness="0" FontSize="12" Cursor="Hand"
+                                        Click="HelpBtn_Click" ToolTip="Show User Guide"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Username -->
+                    <TextBlock Text="USERNAME" Style="{DynamicResource FieldLabel}" Margin="0,0,0,6"/>
+                    <TextBox x:Name="UsernameBox" Style="{DynamicResource ModernTextBox}"
+                             Text="" KeyDown="InputKeyDown"/>
+
+                    <!-- Password -->
+                    <TextBlock Text="PASSWORD" Style="{DynamicResource FieldLabel}" Margin="0,20,0,6"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <PasswordBox x:Name="PasswordBox" Grid.Column="0" Style="{DynamicResource ModernPasswordBox}"
+                                     KeyDown="InputKeyDown"/>
+                        <TextBox x:Name="PasswordTextBox" Grid.Column="0" Style="{DynamicResource ModernTextBox}"
+                                 Visibility="Collapsed" KeyDown="InputKeyDown"/>
+                        <Button x:Name="ShowPasswordBtn" Grid.Column="1" Content="👁" 
+                                Width="36" Margin="4,0,0,0" Background="Transparent" BorderThickness="0"
+                                FontSize="14" Cursor="Hand" Click="ShowPassword_Click"
+                                ToolTip="Show/Hide Password"/>
+                    </Grid>
+
+                    <!-- Forgot Password Link -->
+                    <Button Content="Forgot Password?" HorizontalAlignment="Left" Margin="0,8,0,0"
+                            Background="Transparent" Foreground="{DynamicResource PrimaryBrush}"
+                            BorderThickness="0" FontSize="12" Cursor="Hand"
+                            Click="ForgotPassword_Click"/>
+
+                    <!-- Error Message -->
+                    <TextBlock x:Name="ErrorText" Text="" Foreground="{DynamicResource DangerBrush}"
+                               FontSize="12" Margin="0,12,0,0" Visibility="Collapsed"
+                               TextWrapping="Wrap"/>
+
+                    <!-- Login Button -->
+                    <Button Content="Sign In" Style="{DynamicResource PrimaryButton}"
+                            HorizontalAlignment="Stretch" Margin="0,28,0,0"
+                            Click="LoginButton_Click" x:Name="LoginButton"/>
+
+                    <TextBlock Text="Default credentials: admin / admin123"
+                               FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Center" Margin="0,16,0,0"/>
+
+                    <!-- Close Button -->
+                    <Button Content="✕ Close" HorizontalAlignment="Right" Margin="0,24,0,0"
+                            Background="Transparent" Foreground="{DynamicResource TextSecondaryBrush}"
+                            BorderThickness="0" FontSize="12" Cursor="Hand"
+                            Click="CloseButton_Click"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>
+

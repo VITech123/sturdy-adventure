@@ -1,0 +1,161 @@
+<Page x:Class="EnterpriseWorkReport.Views.Pages.QualityPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{DynamicResource AppBgBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="Quality Reports" Style="{DynamicResource PageTitle}"/>
+                <TextBlock Text="Upload and track employee quality metrics: Accuracy, Error Rate, Rework Count, Quality Score."
+                           Style="{DynamicResource PageSubtitle}"/>
+            </StackPanel>
+
+            <!-- Path Configuration -->
+            <Border Grid.Row="1" Style="{DynamicResource CardBorder}" Padding="16" Margin="0,0,0,16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Path Configuration Row -->
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Report Folder:" VerticalAlignment="Center" 
+                               Margin="0,0,10,0" FontWeight="SemiBold"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="ReportPathBox" Style="{DynamicResource ModernTextBox}"
+                             Text="{Binding QualityReportsPath, Mode=TwoWay}" Margin="0,0,10,0"/>
+                    <Button Grid.Row="0" Grid.Column="2" x:Name="SavePath_Click_Btn" Content="Save Path" Style="{DynamicResource PrimaryButton}"
+                            Padding="12,8" Click="SavePath_Click"/>
+                    
+                    <!-- Date Selection Row -->
+                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="0,12,0,0">
+                        <TextBlock Text="Select Date:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                        <DatePicker x:Name="FilterDateFrom" Width="130" Margin="0,0,10,0" SelectedDateChanged="Filter_Changed"/>
+                        <DatePicker x:Name="FilterDateTo" Width="130" Margin="0,0,10,0" SelectedDateChanged="Filter_Changed"/>
+                        
+                        <Button x:Name="AddQualityBtn" Content="+ Add Quality Report" Style="{DynamicResource PrimaryButton}"
+                                Padding="14,9" FontSize="13" Margin="0,0,10,0" Click="AddQuality_Click"/>
+                        <Button x:Name="ImportBtn" Content="📁 Import CSV/Excel" Style="{DynamicResource OutlineButton}"
+                                Padding="14,9" FontSize="13" Margin="0,0,10,0" Click="ImportFile_Click"/>
+                        
+                        <TextBox x:Name="FilterEmployeeName" Style="{DynamicResource ModernTextBox}" Width="150" Margin="0,0,10,0"
+                                 Tag="Employee Name" ToolTip="Employee Name" TextChanged="Filter_Changed" />
+                        
+                        <Button Content="Clear" Style="{DynamicResource OutlineButton}" Padding="12,9" FontSize="13"
+                                Click="ClearFilter_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Summary Grid -->
+                <Border Grid.Row="0" Style="{DynamicResource CardBorder}" Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <DataGrid x:Name="QualityGrid" Style="{DynamicResource ModernDataGrid}" MaxHeight="400" Grid.Row="0" SelectionChanged="QualityGrid_SelectionChanged">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsBelowThreshold}" Value="True">
+                                            <Setter Property="Background" Value="#FFF5F5"/>
+                                            <Setter Property="Foreground" Value="#C0392B"/>
+                                            <Setter Property="FontWeight" Value="SemiBold"/>
+                                            <Setter Property="ToolTip" Value="⚠ Quality score is below the configured threshold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn x:Name="EmployeeCol" Header="Employee" Binding="{Binding EmployeeName}" Width="*"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding ReportDate, StringFormat='dd/MM/yyyy'}" Width="100"/>
+                                <DataGridTextColumn Header="Accuracy%" Binding="{Binding Accuracy, StringFormat='{}{0:F1}%'}" Width="90"/>
+                                <DataGridTextColumn Header="Error%" Binding="{Binding ErrorRate, StringFormat='{}{0:F1}%'}" Width="80"/>
+                                <DataGridTextColumn Header="Rework" Binding="{Binding ReworkCount}" Width="70"/>
+                                <DataGridTextColumn Header="Score" Binding="{Binding QualityScore, StringFormat='{}{0:F1}'}" Width="70"/>
+                                <DataGridCheckBoxColumn Header="Detailed" Binding="{Binding IsDetailed}" Width="70" IsReadOnly="True"/>
+                                <DataGridTemplateColumn x:Name="ActionsCol" Header="Actions" Width="140">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Edit" Tag="{Binding Id}" Style="{DynamicResource PrimaryButton}"
+                                                        Padding="10,5" FontSize="12" Margin="0,0,6,0" Click="EditQuality_Click"/>
+                                                <Button Content="🗑" Tag="{Binding Id}" Style="{DynamicResource DangerButton}"
+                                                        Padding="10,5" FontSize="12" Click="DeleteQuality_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Remarks" Binding="{Binding Remarks}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Pagination Controls -->
+                        <Border Grid.Row="1" Background="#F8F9FA" BorderBrush="#EEE" BorderThickness="0,1,0,0" Padding="16,8">
+                            <DockPanel LastChildFill="False">
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                                    <TextBlock Text="Show" VerticalAlignment="Center" Foreground="#666" Margin="0,0,8,0"/>
+                                    <ComboBox x:Name="PageSizeCombo" Width="70" SelectedIndex="1" SelectionChanged="PageSize_Changed">
+                                        <ComboBoxItem Content="25"/>
+                                        <ComboBoxItem Content="50"/>
+                                        <ComboBoxItem Content="100"/>
+                                        <ComboBoxItem Content="500"/>
+                                    </ComboBox>
+                                    <TextBlock Text="records" VerticalAlignment="Center" Foreground="#666" Margin="8,0,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center">
+                                    <Button x:Name="PrevPageBtn" Content="Prev" Style="{DynamicResource OutlineButton}" 
+                                            Padding="12,5" Margin="0,0,10,0" Click="PrevPage_Click"/>
+                                    <TextBlock x:Name="PageInfoText" Text="Page 1 of 1" VerticalAlignment="Center" 
+                                               FontWeight="SemiBold" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,10,0"/>
+                                    <Button x:Name="NextPageBtn" Content="Next" Style="{DynamicResource OutlineButton}" 
+                                            Padding="12,5" Click="NextPage_Click"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Grid Splitter -->
+                <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" Background="#E5E7EB" Margin="0,8"/>
+
+                <!-- Detailed View -->
+                <Border Grid.Row="2" Style="{DynamicResource CardBorder}" Padding="0" Margin="0,8,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Border Background="#F9FAFB" Padding="12,8" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+                            <TextBlock x:Name="DetailTitleText" Text="Select a record above to view details" FontWeight="SemiBold" FontSize="12"/>
+                        </Border>
+                        <DataGrid x:Name="DetailGrid" Grid.Row="1" Style="{DynamicResource ModernDataGrid}" AutoGenerateColumns="True" IsReadOnly="True"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>
+
+

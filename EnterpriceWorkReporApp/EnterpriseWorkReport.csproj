@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>10.0</LangVersion>
+    <AssemblyName>EnterpriseWorkReport</AssemblyName>
+    <Version>1.0.0</Version>
+    <Company>Enterprise Solutions</Company>
+    <Product>Enterprise Work Report</Product>
+    <Description>Employee Attendance and Work Reporting System</Description>
+    <Copyright>Copyright 2024</Copyright>
+    <AcceptNPOIOSMFLicense>true</AcceptNPOIOSMFLicense>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Docnet.Core" Version="2.6.0" />
+    <PackageReference Include="itext7" Version="9.6.0" />
+    <PackageReference Include="Npgsql" Version="4.1.13" />
+    <PackageReference Include="NPOI" Version="2.8.0" />
+    <PackageReference Include="QuestPDF" Version="2024.3.3" />
+    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Drawing.Common" Version="10.0.7" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Images\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="wallpaper\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="tessdata\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Program.cs" />
+    <Compile Remove="Forms\LoginForm.cs" />
+    <Compile Remove="Forms\MainDashboard.cs" />
+    <Compile Remove="Services\ImportService.cs" />
+    <Compile Remove="Services\BackupService.cs" />
+    <Compile Remove="dist\**" />
+    <Compile Remove="DBCreator\**" />
+    <Compile Remove="WebApp\**" />
+  </ItemGroup>
+
+</Project>
